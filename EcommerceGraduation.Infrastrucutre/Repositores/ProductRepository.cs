@@ -80,7 +80,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
 
 
             //filter by categoryId
-            if (!productParams.categoryCode.IsNullOrEmpty())
+            if (!string.IsNullOrEmpty(productParams.categoryCode))
             {
                 query = query.Where(m => m.CategoryCode == productParams.categoryCode);
             }
