@@ -15,9 +15,11 @@ namespace EcommerceGraduation.API.Mapping
                 .ReverseMap();
             CreateMap<ProductImage, PhotoDTO>().ReverseMap();
             CreateMap<Product, AddProductDTO>()
-                .ForMember(p => p.Photo, memberOptions: opt => opt.Ignore()).ReverseMap();
+                .ForMember(p => p.Photo, memberOptions: opt => opt.Ignore()).ReverseMap()
+                .ForMember(p => p.Barcode, opt => opt.Ignore());
             CreateMap<Product, UpdateProductDTO>()
-                 .ForMember(p => p.Photo, memberOptions: opt => opt.Ignore()).ReverseMap();
+                 .ForMember(p => p.Photo, memberOptions: opt => opt.Ignore()).ReverseMap()
+                 .ForMember(p => p.Barcode, opt => opt.Ignore());
 
         }
     }

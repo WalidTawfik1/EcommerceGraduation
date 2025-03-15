@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using EcommerceGraduation.Core.Sharing;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceGraduation.Core.Entities;
@@ -26,7 +27,7 @@ public partial class Product
     public int StockQuantity { get; set; }
 
     [StringLength(50)]
-    public string? Barcode { get; set; }
+    public string? Barcode { get; set; } = GenerateCode.GetBarcode();
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedAt { get; set; }
@@ -63,4 +64,9 @@ public partial class Product
     [ForeignKey("SubCategoryCode")]
     [InverseProperty("Products")]
     public virtual SubCategory SubCategoryCodeNavigation { get; set; } = null!;
+    public Product()
+    {
+        Barcode = GenerateCode.GetBarcode();
+
+    }
 }

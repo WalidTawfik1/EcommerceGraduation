@@ -26,6 +26,10 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
 
         public ICartRepository CartRepository { get; }
 
+        public ISubCategoryRepository SubCategoryRepository { get; }
+
+        public IBrandRepository BrandRepository { get; }
+
         public UnitofWork(EcommerceDbContext context, IProductImageManagmentService imageManagmentService, IMapper mapper,
             IConnectionMultiplexer redis)
         {
@@ -37,6 +41,8 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             ProductRepository = new ProductRepository(_context, _mapper, _imageManagmentService);
             ProductImageRepository = new ProductImageRepository(_context);
             CartRepository = new CartRepository(_redis);
+            SubCategoryRepository = new SubCategoryRepository(_context);
+            BrandRepository = new BrandRepositroy(_context);
 
         }
     }

@@ -14,6 +14,11 @@ namespace EcommerceGraduation.API.Controllers
         public ProductController(IUnitofWork work, IMapper mapper) : base(work, mapper)
         {
         }
+        /// <summary>
+        /// Get All Products
+        /// </summary>
+        /// <param name="productParams"></param>
+        /// <returns></returns>
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] ProductParams productParams)
         {
@@ -28,6 +33,11 @@ namespace EcommerceGraduation.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        /// <summary>
+        /// Get Product By Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("GetById/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -47,6 +57,11 @@ namespace EcommerceGraduation.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        /// <summary>
+        /// Add Product
+        /// </summary>
+        /// <param name="productDTO"></param>
+        /// <returns></returns>
         [HttpPost("Add")]
         public async Task<IActionResult> Add(AddProductDTO productDTO)
         {
@@ -62,6 +77,11 @@ namespace EcommerceGraduation.API.Controllers
                 return BadRequest(new APIResponse(400, ex.Message));
             }
         }
+        /// <summary>
+        /// Update Product
+        /// </summary>
+        /// <param name="productDTO"></param>
+        /// <returns></returns>
         [HttpPut("Update")]
         public async Task<IActionResult> Update(UpdateProductDTO productDTO)
         {
@@ -75,6 +95,11 @@ namespace EcommerceGraduation.API.Controllers
                 return BadRequest(new APIResponse(400, ex.Message));
             }
         }
+        /// <summary>
+        /// Delete Product
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {

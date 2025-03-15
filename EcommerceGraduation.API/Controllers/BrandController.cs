@@ -8,9 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EcommerceGraduation.API.Controllers
 {
-    public class CategoryController : BaseController
+
+    public class BrandController : BaseController
     {
-        public CategoryController(IUnitofWork work, IMapper mapper) : base(work, mapper)
+        public BrandController(IUnitofWork work, IMapper mapper) : base(work, mapper)
         {
         }
 
@@ -19,12 +20,12 @@ namespace EcommerceGraduation.API.Controllers
         {
             try
             {
-                var categories = await work.CategoryRepository.GetAllAsync();
-                if (categories == null)
+                var brands = await work.BrandRepository.GetAllAsync();
+                if (brands == null)
                 {
                     return BadRequest(new APIResponse(400));
                 }
-                return Ok(categories);
+                return Ok(brands);
             }
             catch (Exception ex)
             {
@@ -36,12 +37,12 @@ namespace EcommerceGraduation.API.Controllers
         {
             try
             {
-                var category = await work.CategoryRepository.GetByIdAsync(code);
-                if (category == null)
+                var brand = await work.BrandRepository.GetByIdAsync(code);
+                if (brand == null)
                 {
-                    return BadRequest(new APIResponse(400, "This Category Not Found"));
+                    return BadRequest(new APIResponse(400, "This Brand Not Found"));
                 }
-                return Ok(category);
+                return Ok(brand);
             }
             catch (Exception ex)
             {
@@ -49,45 +50,49 @@ namespace EcommerceGraduation.API.Controllers
             }
         }
         [HttpPost("Add")]
-        public async Task<IActionResult> Add(AddCategoryDTO addcategoryDTO)
+        public async Task<IActionResult> Add(AddBrandDTO addBrandDTO)
         {
             try
             {
-                var category = mapper.Map<Category>(addcategoryDTO);
-                await work.CategoryRepository.AddAsync(category);
-                return Ok(new APIResponse(200, "Category added succssfully"));
+                var brand = mapper.Map<Brand>(addBrandDTO);
+                await work.BrandRepository.AddAsync(brand);
+                return Ok(new APIResponse(200, "Brand added succssfully"));
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPut("Update")]
-        public async Task<IActionResult> Update(UpdateCategoryDTO updatecategoryDTO)
+        public async Task<IActionResult> Update(UpdateBrandDTO updateBrandDTO)
         {
             try
             {
-                var category = mapper.Map<Category>(updatecategoryDTO);
-                await work.CategoryRepository.UpdateAsync(category);
-                return Ok(new APIResponse(200, "Category updated succssfully"));
+                var brand = mapper.Map<Brand>(updateBrandDTO);
+                await work.BrandRepository.UpdateAsync(brand);
+                return Ok(new APIResponse(200, "Brand updated succssfully"));
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpDelete("Delete/{code}")]
         public async Task<IActionResult> Delete(string code)
         {
             try
             {
-                await work.CategoryRepository.DeleteAsync(code);
-                return Ok(new APIResponse(200, "Category removed succssfully"));
+                await work.BrandRepository.DeleteAsync(code);
+                return Ok(new APIResponse(200, "Brand deleted succssfully"));
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
-    }
+    
+
+}
 }

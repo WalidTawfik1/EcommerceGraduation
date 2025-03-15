@@ -108,9 +108,9 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
         {
             if (productDTO == null) return false;
             var FindProduct = await context.Products
-                .Include(m => m.CategoryCode)
-                .Include(m => m.SubCategoryCode)
-                .Include(m => m.BrandCode)
+                .Include(m => m.CategoryCodeNavigation)
+                .Include(m => m.SubCategoryCodeNavigation)
+                .Include(m => m.BrandCodeNavigation)
                 .Include(m => m.ProductImages)
                 .FirstOrDefaultAsync(i => i.ProductId == productDTO.ProductId);
             if (FindProduct == null) return false;
