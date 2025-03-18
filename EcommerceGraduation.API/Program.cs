@@ -31,12 +31,18 @@ namespace EcommerceGraduation.API
                 app.UseSwaggerUI();
             }
             app.UseCors("CORSPolicy");
+
             app.UseMiddleware<ExceptionsMiddleware>();
-            app.UseStatusCodePagesWithReExecute("/errors/{0}");
-            app.UseHttpsRedirection();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
+            app.UseStaticFiles();
+
+            app.UseStatusCodePagesWithReExecute("/errors/{0}");
+
+            app.UseHttpsRedirection();
 
             app.MapControllers();
 

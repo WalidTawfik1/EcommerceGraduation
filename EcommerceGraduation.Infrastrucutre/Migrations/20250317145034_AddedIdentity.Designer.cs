@@ -4,6 +4,7 @@ using EcommerceGraduation.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EcommerceGraduation.Infrastrucutre.Migrations
 {
     [DbContext(typeof(EcommerceDbContext))]
-    partial class EcommerceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250317145034_AddedIdentity")]
+    partial class AddedIdentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,7 +56,7 @@ namespace EcommerceGraduation.Infrastrucutre.Migrations
 
                     b.HasIndex("ChangedBy");
 
-                    b.ToTable("AuditLog", (string)null);
+                    b.ToTable("AuditLog");
                 });
 
             modelBuilder.Entity("EcommerceGraduation.Core.Entities.Brand", b =>
@@ -75,7 +78,7 @@ namespace EcommerceGraduation.Infrastrucutre.Migrations
                     b.HasIndex(new[] { "BrandCode" }, "UQ__Brand__44292CC74BAD8DC1")
                         .IsUnique();
 
-                    b.ToTable("Brand", (string)null);
+                    b.ToTable("Brand");
                 });
 
             modelBuilder.Entity("EcommerceGraduation.Core.Entities.Category", b =>
@@ -95,7 +98,7 @@ namespace EcommerceGraduation.Infrastrucutre.Migrations
                     b.HasIndex(new[] { "Name" }, "UQ__Category__737584F6BA133EFE")
                         .IsUnique();
 
-                    b.ToTable("Category", (string)null);
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("EcommerceGraduation.Core.Entities.Customer", b =>
@@ -269,7 +272,7 @@ namespace EcommerceGraduation.Infrastrucutre.Migrations
 
                     b.HasIndex("OrderNumber");
 
-                    b.ToTable("Invoices", (string)null);
+                    b.ToTable("Invoices");
                 });
 
             modelBuilder.Entity("EcommerceGraduation.Core.Entities.Order", b =>
@@ -309,7 +312,7 @@ namespace EcommerceGraduation.Infrastrucutre.Migrations
 
                     b.HasIndex(new[] { "OrderDate" }, "IDX_Order_Date");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("EcommerceGraduation.Core.Entities.OrderDetail", b =>
@@ -417,7 +420,7 @@ namespace EcommerceGraduation.Infrastrucutre.Migrations
                         .IsUnique()
                         .HasFilter("[TransactionID] IS NOT NULL");
 
-                    b.ToTable("Payment", (string)null);
+                    b.ToTable("Payment");
                 });
 
             modelBuilder.Entity("EcommerceGraduation.Core.Entities.Product", b =>
@@ -486,7 +489,7 @@ namespace EcommerceGraduation.Infrastrucutre.Migrations
                         .IsUnique()
                         .HasFilter("[Barcode] IS NOT NULL");
 
-                    b.ToTable("Product", (string)null);
+                    b.ToTable("Product");
                 });
 
             modelBuilder.Entity("EcommerceGraduation.Core.Entities.ProductImage", b =>
@@ -513,7 +516,7 @@ namespace EcommerceGraduation.Infrastrucutre.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductImage", (string)null);
+                    b.ToTable("ProductImage");
                 });
 
             modelBuilder.Entity("EcommerceGraduation.Core.Entities.ProductReview", b =>
@@ -552,7 +555,7 @@ namespace EcommerceGraduation.Infrastrucutre.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductReview", (string)null);
+                    b.ToTable("ProductReview");
                 });
 
             modelBuilder.Entity("EcommerceGraduation.Core.Entities.Shipping", b =>
@@ -615,7 +618,7 @@ namespace EcommerceGraduation.Infrastrucutre.Migrations
                         .IsUnique()
                         .HasFilter("[TrackingNumber] IS NOT NULL");
 
-                    b.ToTable("Shipping", (string)null);
+                    b.ToTable("Shipping");
                 });
 
             modelBuilder.Entity("EcommerceGraduation.Core.Entities.SubCategory", b =>
@@ -642,7 +645,7 @@ namespace EcommerceGraduation.Infrastrucutre.Migrations
                     b.HasIndex(new[] { "Name" }, "UQ__SubCateg__737584F670BC1034")
                         .IsUnique();
 
-                    b.ToTable("SubCategory", (string)null);
+                    b.ToTable("SubCategory");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<string>", b =>

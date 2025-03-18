@@ -2,24 +2,23 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using EcommerceGraduation.Core.Sharing;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceGraduation.Core.Entities;
 
 [Table("Customer")]
-[Index("Email", Name = "IDX_Customer_Email")]
-[Index("CustomerCode", Name = "UQ__Customer__066785210EEA4C72", IsUnique = true)]
-[Index("Email", Name = "UQ__Customer__A9D105346050AA0D", IsUnique = true)]
-public partial class Customer
+[Index("Id", Name = "UQ__Customer__066785210EEA4C72", IsUnique = true)]
+public partial class Customer : IdentityUser<string>
 {
+   /* public Customer()
+    {
+        Id = Guid.NewGuid().ToString().Substring(0, 20);
+        // Ensures ID is always set
+    }*/
     [StringLength(255)]
     public string Name { get; set; } = null!;
-
-    [StringLength(255)]
-    public string Email { get; set; } = null!;
-
-    [StringLength(255)]
-    public string PasswordHash { get; set; } = null!;
 
     [StringLength(500)]
     public string? Address { get; set; }
@@ -44,7 +43,7 @@ public partial class Customer
 
     [Key]
     [StringLength(20)]
-    public string CustomerCode { get; set; } = null!;
+    public override string Id { get; set; } = Guid.NewGuid().ToString().Substring(0, 18);
 
     [StringLength(10)]
     public string? Gender { get; set; }
@@ -62,4 +61,6 @@ public partial class Customer
 
     [InverseProperty("CustomerCodeNavigation")]
     public virtual ICollection<ProductReview> ProductReviews { get; set; } = new List<ProductReview>();
+
+    //public override string UserName { get => Email; set => Email = value; }
 }

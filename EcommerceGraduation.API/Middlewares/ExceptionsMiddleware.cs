@@ -1,4 +1,5 @@
 ﻿using EcommerceGraduation.API.Helper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System.Net;
 using System.Text.Json;
@@ -45,6 +46,8 @@ namespace EcommerceGraduation.API.Middlewares
                     : new APIExceptions(context.Response.StatusCode, ex.Message);
                 var json = JsonSerializer.Serialize(response);
                 await context.Response.WriteAsync(json);
+                var innerException = ex.InnerException?.Message;
+                
             }
         }
 

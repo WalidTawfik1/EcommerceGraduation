@@ -26,6 +26,12 @@ namespace EcommerceGraduation.Core.Sharing
         {
             return random.Next(1000000, 9999999).ToString();
         }
+
+        public static string GetCustomerId()
+        {
+            return random.Next(2000, 9999999).ToString();
+
+        }
     }
 
 }

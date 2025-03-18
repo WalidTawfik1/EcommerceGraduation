@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using EcommerceGraduation.Core.Entities;
 using EcommerceGraduation.Core.Interfaces;
 using EcommerceGraduation.Core.Services;
 using EcommerceGraduation.Infrastructure.Data;
+using Microsoft.AspNetCore.Identity;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -17,6 +19,10 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
         private readonly IProductImageManagmentService _imageManagmentService;
         private readonly IMapper _mapper;
         private readonly IConnectionMultiplexer _redis;
+        private readonly UserManager<Customer> _userManager;
+        private readonly IEmailService _emailService;
+        private readonly SignInManager<Customer> _signInManager;
+        private readonly IGenerateToken _generateToken;
 
         public ICategoryRepository CategoryRepository { get; }
 
@@ -30,20 +36,27 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
 
         public IBrandRepository BrandRepository { get; }
 
+        public IAuthentication Authentication { get; }
+
         public UnitofWork(EcommerceDbContext context, IProductImageManagmentService imageManagmentService, IMapper mapper,
-            IConnectionMultiplexer redis)
+            IConnectionMultiplexer redis, UserManager<Customer> userManager, IEmailService emailService, SignInManager<Customer> signInManager, IGenerateToken generateToken)
         {
             _context = context;
             _imageManagmentService = imageManagmentService;
             _mapper = mapper;
             _redis = redis;
+            _userManager = userManager;
+            _emailService = emailService;
+            _signInManager = signInManager;
+            _generateToken = generateToken;
+
             CategoryRepository = new CategoryRepository(_context);
             ProductRepository = new ProductRepository(_context, _mapper, _imageManagmentService);
             ProductImageRepository = new ProductImageRepository(_context);
             CartRepository = new CartRepository(_redis);
             SubCategoryRepository = new SubCategoryRepository(_context);
             BrandRepository = new BrandRepositroy(_context);
-
+            Authentication = new AuthenticationRepository(_userManager, _emailService, _signInManager,_generateToken);
         }
     }
 }
