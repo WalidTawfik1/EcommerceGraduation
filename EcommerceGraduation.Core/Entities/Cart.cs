@@ -18,6 +18,6 @@ public class Cart
     }
     public string Id { get; set; }
     public List<CartItem> Items { get; set; } = new List<CartItem>();
-    public decimal TotalAmount => Items.Sum(item => item.TotalPrice);
+    public decimal SubAmount => Items.Sum(item => item.TotalPrice);
 
 }

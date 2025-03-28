@@ -8,7 +8,7 @@ namespace EcommerceGraduation.Core.Entities
 {
     public class CartItem
     {
-        public int Id { get; set; }
+        public int ProductId { get; set; }
         public String Name { get; set; }
         public string Description { get; set; }
         public int Quantity { get; set; }

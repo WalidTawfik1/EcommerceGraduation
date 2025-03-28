@@ -24,7 +24,6 @@ namespace EcommerceGraduation.Core.DTO
         public string PhoneNumber { get; set; }
         public string Gender { get; set; }
         public DateOnly DateOfBirth { get; set; }
-        public string UserType { get; } = "Customer";
     }
 
     public record ResetPasswordDTO: LoginDTO

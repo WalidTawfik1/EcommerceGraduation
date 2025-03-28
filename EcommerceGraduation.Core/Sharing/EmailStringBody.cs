@@ -48,7 +48,7 @@ namespace EcommerceGraduation.Core.Sharing
                         <div class='container'>
                             <div class='content'>
                                 <div class='message'>{message}</div>
-                                <a href=""http://localhost:3000/Account/component?email={email}&code={encodeToken}""> 
+                                <a href=""http://localhost:3000/Account/{component}?email={email}&code={encodeToken}""> 
                                         {message} 
                                     </a>
                             </div>

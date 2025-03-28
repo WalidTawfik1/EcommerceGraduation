@@ -69,6 +69,5 @@ namespace EcommerceGraduation.API.Controllers
             }
             return Ok(new APIResponse(200, result));
         }
-
     }
 }

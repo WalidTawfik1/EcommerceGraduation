@@ -100,9 +100,9 @@ public partial class EcommerceDbContext : IdentityDbContext<Customer, IdentityRo
             entity.Property(e => e.Total).HasComputedColumnSql("(([TotalBeforeDiscount]-[TotalBeforeDiscount]*([DiscountPercent]/(100)))+[ShippingValue])", true);
             entity.Property(e => e.TotalAfterDiscount).HasComputedColumnSql("([TotalBeforeDiscount]-[TotalBeforeDiscount]*([DiscountPercent]/(100)))", true);
             entity.Property(e => e.TotalDiscount).HasComputedColumnSql("([TotalBeforeDiscount]*([DiscountPercent]/(100)))", true);
-            entity.HasOne(d => d.CustomerCodeNavigation) // Updated navigation property name
+            entity.HasOne(d => d.CustomerCodeNavigation) 
                   .WithMany(p => p.Invoices)
-                  .HasForeignKey(e => e.CustomerCode) // Use CustomerId
+                  .HasForeignKey(e => e.CustomerCode) 
                   .HasConstraintName("FK__Invoices__Custom__671F4F74");
             entity.HasOne(d => d.OrderNumberNavigation)
                   .WithMany(p => p.Invoices)
@@ -115,10 +115,14 @@ public partial class EcommerceDbContext : IdentityDbContext<Customer, IdentityRo
             entity.HasKey(e => e.OrderNumber).HasName("PK__Orders__CAC5E742C8EA43C2");
             entity.Property(e => e.OrderDate).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.TotalAmount).HasDefaultValue(0m);
-            entity.HasOne(d => d.CustomerCodeNavigation) // Updated navigation property name
+            entity.HasOne(d => d.CustomerCodeNavigation) 
                   .WithMany(p => p.Orders)
-                  .HasForeignKey(e => e.CustomerCode) // Use CustomerId
+                  .HasForeignKey(e => e.CustomerCode) 
                   .HasConstraintName("FK_Orders_Customer");
+            entity.Property(e => e.OrderStatus)
+                    .HasConversion<string>();
+            entity.Property(e => e.PaymentStatus)
+                  .HasConversion<string>();
         });
 
         // OrderDetail configuration
@@ -187,9 +191,9 @@ public partial class EcommerceDbContext : IdentityDbContext<Customer, IdentityRo
         {
             entity.HasKey(e => e.ReviewId).HasName("PK__ProductR__74BC79AEA53AB25F");
             entity.Property(e => e.ReviewDate).HasDefaultValueSql("(getdate())");
-            entity.HasOne(d => d.CustomerCodeNavigation) // Updated navigation property name
+            entity.HasOne(d => d.CustomerCodeNavigation) 
                   .WithMany(p => p.ProductReviews)
-                  .HasForeignKey(e => e.CustomerCode) // Use CustomerId
+                  .HasForeignKey(e => e.CustomerCode) 
                   .HasConstraintName("FK_Reviews_Customer");
             entity.HasOne(d => d.Product)
                   .WithMany(p => p.ProductReviews)
@@ -205,6 +209,10 @@ public partial class EcommerceDbContext : IdentityDbContext<Customer, IdentityRo
                   .WithMany(p => p.Shippings)
                   .OnDelete(DeleteBehavior.Cascade)
                   .HasConstraintName("fk_shipping_orders");
+            entity.Property(e => e.ShippingMethod)
+                    .HasConversion<string>();
+            entity.Property(e => e.ShippingStatus)
+                    .HasConversion<string>();
         });
 
         // SubCategory configuration

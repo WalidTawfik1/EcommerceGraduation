@@ -9,8 +9,8 @@ namespace EcommerceGraduation.Core.Interfaces
 {
     public interface ICartRepository
     {
-        Task<Cart> GetBasketAsync(string CartId);
-        Task<Cart> UpdateBasketAsync(Cart cart);
-        Task<bool> DeleteBasketAsync(string CartId);
+        Task<Cart> GetCartAsync(string CartId);
+        Task<Cart> UpdateCartAsync(Cart cart);
+        Task<bool> DeleteCartAsync(string CartId);
     }
 }

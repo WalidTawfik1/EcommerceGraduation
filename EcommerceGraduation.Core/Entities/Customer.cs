@@ -12,11 +12,11 @@ namespace EcommerceGraduation.Core.Entities;
 [Index("Id", Name = "UQ__Customer__066785210EEA4C72", IsUnique = true)]
 public partial class Customer : IdentityUser<string>
 {
-   /* public Customer()
+    public Customer()
     {
-        Id = Guid.NewGuid().ToString().Substring(0, 20);
-        // Ensures ID is always set
-    }*/
+        Id = Guid.NewGuid().ToString("N")[..18];
+    }
+
     [StringLength(255)]
     public string Name { get; set; } = null!;
 
@@ -43,8 +43,7 @@ public partial class Customer : IdentityUser<string>
 
     [Key]
     [StringLength(20)]
-    public override string Id { get; set; } = Guid.NewGuid().ToString().Substring(0, 18);
-
+    public override string Id { get; set; } = null!;
     [StringLength(10)]
     public string? Gender { get; set; }
 
@@ -62,5 +61,5 @@ public partial class Customer : IdentityUser<string>
     [InverseProperty("CustomerCodeNavigation")]
     public virtual ICollection<ProductReview> ProductReviews { get; set; } = new List<ProductReview>();
 
-    //public override string UserName { get => Email; set => Email = value; }
+    public override string UserName { get; set; }
 }

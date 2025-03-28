@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceGraduation.Core.Entities;
@@ -27,17 +28,15 @@ public partial class Shipping
     [StringLength(20)]
     public string? PostalCode { get; set; }
 
-    [StringLength(100)]
-    public string? ShippingMethod { get; set; }
+    public ShippingMethod ShippingMethod { get; set; }
 
     [StringLength(100)]
-    public string? Carrier { get; set; }
+    public string? Carrier { get; set; } = "DHL";
 
     [StringLength(50)]
     public string? TrackingNumber { get; set; }
 
-    [StringLength(50)]
-    public string? ShippingStatus { get; set; }
+    public Status ShippingStatus { get; set; } = Status.Pending;
 
     public DateOnly? EstimatedDeliveryDate { get; set; }
 
@@ -45,6 +44,7 @@ public partial class Shipping
     [Unicode(false)]
     public string? OrderNumber { get; set; }
 
+    [JsonIgnore]
     [ForeignKey("OrderNumber")]
     [InverseProperty("Shippings")]
     public virtual Order? OrderNumberNavigation { get; set; }

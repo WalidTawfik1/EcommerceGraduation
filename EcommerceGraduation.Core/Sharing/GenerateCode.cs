@@ -32,6 +32,12 @@ namespace EcommerceGraduation.Core.Sharing
             return random.Next(2000, 9999999).ToString();
 
         }
+
+        public static string GenerateTrackingNumber(int shippingId)
+        {
+            return $"TRK-{DateTime.Now:yyyyMM}-{shippingId:D6}";
+        }
+
     }
 
 }

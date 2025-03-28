@@ -21,12 +21,12 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
 
         }
 
-        public Task<bool> DeleteBasketAsync(string CartId)
+        public Task<bool> DeleteCartAsync(string CartId)
         {
             return _database.KeyDeleteAsync(CartId);
         }
 
-        public async Task<Cart> GetBasketAsync(string CartId)
+        public async Task<Cart> GetCartAsync(string CartId)
         {
             var result = await _database.StringGetAsync(CartId);
             if (!string.IsNullOrEmpty(result))
@@ -36,14 +36,14 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             return null;
         }
 
-        public async Task<Cart> UpdateBasketAsync(Cart cart)
+        public async Task<Cart> UpdateCartAsync(Cart cart)
         {
             var _basket = await _database.StringSetAsync(cart.Id.ToString(),
                 JsonSerializer.Serialize(cart),
                 TimeSpan.FromDays(3));
             if (_basket)
             {
-                return await GetBasketAsync(cart.Id.ToString());
+                return await GetCartAsync(cart.Id.ToString());
             }
             return null;
         }

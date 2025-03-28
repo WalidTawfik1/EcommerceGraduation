@@ -42,6 +42,9 @@ namespace EcommerceGraduation.Infrastrucutre
             // Register the IGenerateToken service
             services.AddScoped<IGenerateToken, GenerateToken>();
 
+            // Register the IOrderService service
+            services.AddScoped<IOrderService, OrderService>();
+
             // Register the AppDbContext with SQL Server
             services.AddDbContext<EcommerceDbContext>(option =>
             {

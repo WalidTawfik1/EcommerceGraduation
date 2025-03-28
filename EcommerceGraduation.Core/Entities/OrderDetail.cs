@@ -18,6 +18,10 @@ public partial class OrderDetail
 
     public double Quantity { get; set; }
 
+    public string? MainImage { get; set; }
+
+    public string? ProductName { get; set; }
+
     [Column(TypeName = "decimal(10, 2)")]
     public decimal Price { get; set; }
 

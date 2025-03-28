@@ -13,7 +13,7 @@ namespace EcommerceGraduation.API
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("CORSPolicy", builder =>
-                builder.AllowAnyMethod().AllowAnyHeader().AllowCredentials().WithOrigins("https://localhost:3000"));
+                builder.AllowAnyMethod().AllowAnyHeader().AllowCredentials().SetIsOriginAllowed(_ => true));
             });
             builder.Services.AddMemoryCache();
             builder.Services.AddControllers();
