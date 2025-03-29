@@ -8,13 +8,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EcommerceGraduation.API.Controllers
 {
-
+    /// <summary>
+    /// Controller for managing subcategories.
+    /// </summary>
     public class SubCategoryController : BaseController
     {
         public SubCategoryController(IUnitofWork work, IMapper mapper) : base(work, mapper)
         {
         }
 
+        /// <summary>
+        /// Gets all subcategories.
+        /// </summary>
+        /// <returns>A list of all subcategories.</returns>
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll()
         {
@@ -32,6 +38,12 @@ namespace EcommerceGraduation.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Gets a subcategory by its code.
+        /// </summary>
+        /// <param name="code">The subcategory code.</param>
+        /// <returns>The subcategory with the specified code.</returns>
         [HttpGet("GetByCode/{code}")]
         public async Task<IActionResult> GetByCode(string code)
         {
@@ -49,6 +61,12 @@ namespace EcommerceGraduation.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Adds a new subcategory.
+        /// </summary>
+        /// <param name="addSubCategoryDTO">The subcategory details.</param>
+        /// <returns>A response indicating the result of the addition.</returns>
         [HttpPost("Add")]
         public async Task<IActionResult> Add(AddSubCategoryDTO addSubCategoryDTO)
         {
@@ -56,7 +74,7 @@ namespace EcommerceGraduation.API.Controllers
             {
                 var subCategory = mapper.Map<SubCategory>(addSubCategoryDTO);
                 await work.SubCategoryRepository.AddAsync(subCategory);
-                return Ok(new APIResponse(200, "SubCategory added succssfully"));
+                return Ok(new APIResponse(200, "SubCategory added successfully"));
             }
             catch (Exception ex)
             {
@@ -64,6 +82,11 @@ namespace EcommerceGraduation.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates an existing subcategory.
+        /// </summary>
+        /// <param name="updateSubCategoryDTO">The subcategory details.</param>
+        /// <returns>A response indicating the result of the update.</returns>
         [HttpPut("Update")]
         public async Task<IActionResult> Update(UpdateSubCategoryDTO updateSubCategoryDTO)
         {
@@ -71,7 +94,7 @@ namespace EcommerceGraduation.API.Controllers
             {
                 var subCategory = mapper.Map<SubCategory>(updateSubCategoryDTO);
                 await work.SubCategoryRepository.UpdateAsync(subCategory);
-                return Ok(new APIResponse(200, "SubCategory updated succssfully"));
+                return Ok(new APIResponse(200, "SubCategory updated successfully"));
             }
             catch (Exception ex)
             {
@@ -79,13 +102,18 @@ namespace EcommerceGraduation.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a subcategory by its code.
+        /// </summary>
+        /// <param name="code">The subcategory code.</param>
+        /// <returns>A response indicating the result of the deletion.</returns>
         [HttpDelete("Delete/{code}")]
         public async Task<IActionResult> Delete(string code)
         {
             try
             {
                 await work.SubCategoryRepository.DeleteAsync(code);
-                return Ok(new APIResponse(200, "SubCategory deleted succssfully"));
+                return Ok(new APIResponse(200, "SubCategory deleted successfully"));
             }
             catch (Exception ex)
             {

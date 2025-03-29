@@ -92,6 +92,7 @@ namespace EcommerceGraduation.Infrastrucutre
                     ValidateIssuer = true,
                     ValidIssuer = configuration["Token:Issuer"],
                     ValidateAudience = false,
+                    ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 };
                 opt.Events = new JwtBearerEvents()

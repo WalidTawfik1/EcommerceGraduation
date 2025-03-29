@@ -8,12 +8,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EcommerceGraduation.API.Controllers
 {
+    /// <summary>
+    /// Controller for managing categories.
+    /// </summary>
     public class CategoryController : BaseController
     {
         public CategoryController(IUnitofWork work, IMapper mapper) : base(work, mapper)
         {
         }
 
+        /// <summary>
+        /// Gets all categories.
+        /// </summary>
+        /// <returns>A list of all categories.</returns>
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll()
         {
@@ -31,6 +38,12 @@ namespace EcommerceGraduation.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Gets a category by its code.
+        /// </summary>
+        /// <param name="code">The category code.</param>
+        /// <returns>The category with the specified code.</returns>
         [HttpGet("GetByCode/{code}")]
         public async Task<IActionResult> GetByCode(string code)
         {
@@ -48,41 +61,59 @@ namespace EcommerceGraduation.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Adds a new category.
+        /// </summary>
+        /// <param name="addCategoryDTO">The category details.</param>
+        /// <returns>A response indicating the result of the addition.</returns>
         [HttpPost("Add")]
-        public async Task<IActionResult> Add(AddCategoryDTO addcategoryDTO)
+        public async Task<IActionResult> Add(AddCategoryDTO addCategoryDTO)
         {
             try
             {
-                var category = mapper.Map<Category>(addcategoryDTO);
+                var category = mapper.Map<Category>(addCategoryDTO);
                 await work.CategoryRepository.AddAsync(category);
-                return Ok(new APIResponse(200, "Category added succssfully"));
+                return Ok(new APIResponse(200, "Category added successfully"));
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Updates an existing category.
+        /// </summary>
+        /// <param name="updateCategoryDTO">The category details.</param>
+        /// <returns>A response indicating the result of the update.</returns>
         [HttpPut("Update")]
-        public async Task<IActionResult> Update(UpdateCategoryDTO updatecategoryDTO)
+        public async Task<IActionResult> Update(UpdateCategoryDTO updateCategoryDTO)
         {
             try
             {
-                var category = mapper.Map<Category>(updatecategoryDTO);
+                var category = mapper.Map<Category>(updateCategoryDTO);
                 await work.CategoryRepository.UpdateAsync(category);
-                return Ok(new APIResponse(200, "Category updated succssfully"));
+                return Ok(new APIResponse(200, "Category updated successfully"));
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Deletes a category by its code.
+        /// </summary>
+        /// <param name="code">The category code.</param>
+        /// <returns>A response indicating the result of the deletion.</returns>
         [HttpDelete("Delete/{code}")]
         public async Task<IActionResult> Delete(string code)
         {
             try
             {
                 await work.CategoryRepository.DeleteAsync(code);
-                return Ok(new APIResponse(200, "Category removed succssfully"));
+                return Ok(new APIResponse(200, "Category removed successfully"));
             }
             catch (Exception ex)
             {

@@ -6,6 +6,9 @@ using System.Security.Claims;
 
 namespace EcommerceGraduation.API.Controllers
 {
+    /// <summary>
+    /// Controller for managing orders.
+    /// </summary>
     [Route("[controller]")]
     [ApiController]
     public class OrderController : ControllerBase
@@ -15,6 +18,12 @@ namespace EcommerceGraduation.API.Controllers
         {
             _orderService = orderService;
         }
+
+        /// <summary>
+        /// Creates a new order.
+        /// </summary>
+        /// <param name="orderDTO">The order details.</param>
+        /// <returns>The created order.</returns>
         [HttpPost("Create")]
         public async Task<IActionResult> CreateOrderAsync([FromBody] OrderDTO orderDTO)
         {
@@ -33,9 +42,12 @@ namespace EcommerceGraduation.API.Controllers
             {
                 return StatusCode(500, new { message = ex.Message, innerException = ex.InnerException?.Message });
             }
-
         }
 
+        /// <summary>
+        /// Gets all orders for the authenticated user.
+        /// </summary>
+        /// <returns>A list of orders for the user.</returns>
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllOrdersForUserAsync()
         {
@@ -56,6 +68,11 @@ namespace EcommerceGraduation.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets an order by its number.
+        /// </summary>
+        /// <param name="orderNumber">The order number.</param>
+        /// <returns>The order with the specified number.</returns>
         [HttpGet("GetOrderById")]
         public async Task<IActionResult> GetOrderByIdAsync(string orderNumber)
         {
