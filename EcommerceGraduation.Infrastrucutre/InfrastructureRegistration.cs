@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,10 +25,8 @@ namespace EcommerceGraduation.Infrastrucutre
 {
     public static class InfrastructureRegistration
     {
-        public static IServiceCollection InfrastructureConfiguration(this IServiceCollection services, IConfiguration configuration)
+        public static object InfrastructureConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-
-
             // Register the IUnitofWork service
             services.AddScoped<IUnitofWork, UnitofWork>();
 
@@ -46,19 +45,18 @@ namespace EcommerceGraduation.Infrastrucutre
             services.AddScoped<IOrderService, OrderService>();
 
             // Register the AppDbContext with SQL Server
-            services.AddDbContext<EcommerceDbContext>(option =>
+            services.AddDbContext<EcommerceDbContext>((options) =>
             {
-                option.UseSqlServer(configuration.GetConnectionString("EcommerceDatabase"));
+                options.UseSqlServer(configuration.GetConnectionString("EcommerceDatabase"));
             });
 
             services.AddSingleton<IConnectionMultiplexer>(i =>
             {
-
                 var config = ConfigurationOptions.Parse(configuration.GetConnectionString("Redis"));
                 return ConnectionMultiplexer.Connect(config);
             });
 
-            services.AddIdentity<Customer,IdentityRole<string>>(opt =>
+            services.AddIdentity<Customer, IdentityRole<string>>(opt =>
             {
                 opt.Password.RequireDigit = true;
                 opt.Password.RequireLowercase = true;
@@ -69,10 +67,10 @@ namespace EcommerceGraduation.Infrastrucutre
 
             services.AddAuthentication(opt =>
             {
-            opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            opt.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;    
-            }).AddCookie( c =>
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie(c =>
             {
                 c.Cookie.Name = "token";
                 c.Events.OnRedirectToLogin = context =>
@@ -104,7 +102,10 @@ namespace EcommerceGraduation.Infrastrucutre
                     }
                 };
             });
-            
+
+            // Allow user tracking
+            services.AddHttpContextAccessor();
+
             return services;
         }
     }

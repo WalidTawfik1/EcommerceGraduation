@@ -25,6 +25,9 @@ public partial class AuditLog
     [Column(TypeName = "datetime")]
     public DateTime? ChangeDate { get; set; }
 
+    [Column(TypeName = "nvarchar(max)")]
+    public string? Changes { get; set; } = string.Empty;
+
     [ForeignKey("ChangedBy")]
     [InverseProperty("AuditLogs")]
     public virtual Customer? ChangedByNavigation { get; set; }

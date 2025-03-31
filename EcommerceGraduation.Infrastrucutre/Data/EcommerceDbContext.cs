@@ -5,26 +5,32 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Text;
+using System.Security.AccessControl;
 
 namespace EcommerceGraduation.Infrastructure.Data;
 
 public partial class EcommerceDbContext : IdentityDbContext<Customer, IdentityRole<string>, string>
 {
     private readonly IConfiguration _configuration;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public EcommerceDbContext()
     {
     }
 
-    public EcommerceDbContext(DbContextOptions<EcommerceDbContext> options, IConfiguration configuration)
+    public EcommerceDbContext(DbContextOptions<EcommerceDbContext> options, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         : base(options)
     {
         _configuration = configuration;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public virtual DbSet<AuditLog> AuditLogs { get; set; }
     public virtual DbSet<Brand> Brands { get; set; }
-    // public virtual DbSet<Cart> Carts { get; set; }
     public virtual DbSet<Category> Categories { get; set; }
     public virtual DbSet<Customer> Customers { get; set; }
     public virtual DbSet<Invoice> Invoices { get; set; }
@@ -36,6 +42,135 @@ public partial class EcommerceDbContext : IdentityDbContext<Customer, IdentityRo
     public virtual DbSet<ProductReview> ProductReviews { get; set; }
     public virtual DbSet<Shipping> Shippings { get; set; }
     public virtual DbSet<SubCategory> SubCategories { get; set; }
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Collect modified entities
+            var modifiedEntities = ChangeTracker.Entries()
+                .Where(x => x.State == EntityState.Modified || x.State == EntityState.Added || x.State == EntityState.Deleted)
+                .Where(x => !(x.Entity is AuditLog))
+                .ToList();
+
+            var userId = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "System";
+
+            // Create audit logs
+            foreach (var change in modifiedEntities)
+            {
+                string action = MapEntityStateToAction(change.State);
+
+                var auditLog = new AuditLog
+                {
+                    TableName = change.Entity.GetType().Name,
+                    Action = action,
+                    ChangedBy = userId,
+                    ChangeDate = DateTime.Now,
+                    Changes = GetChanges(change)
+                };
+
+                this.Add(auditLog);
+            }
+
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException ex)
+        {
+            var innerException = ex.InnerException;
+            var innerExceptionMessage = innerException?.Message ?? "No inner exception details";
+
+            Console.WriteLine($"Database update error: {ex.Message}");
+            Console.WriteLine($"Inner exception: {innerExceptionMessage}");
+
+            throw;
+        }
+    }
+
+    private string MapEntityStateToAction(EntityState state)
+    {
+        switch (state)
+        {
+            case EntityState.Added:
+                return "INSERT"; 
+            case EntityState.Modified:
+                return "UPDATE";
+            case EntityState.Deleted:
+                return "DELETE";
+            default:
+                return "NULL";
+        }
+    }
+    private string GetChanges(EntityEntry change)
+    {
+        var changes = new StringBuilder();
+
+        switch (change.State)
+        {
+            case EntityState.Added:
+                changes.AppendLine("New entity created with values:");
+                foreach (var property in change.CurrentValues.Properties)
+                {
+                    if (property.PropertyInfo?.PropertyType.IsClass == true &&
+                        property.PropertyInfo.PropertyType != typeof(string))
+                        continue;
+
+                    var currentValue = change.CurrentValues[property]?.ToString() ?? "NULL";
+                    changes.AppendLine($"{property.Name}: '{currentValue}'");
+                }
+                break;
+
+            case EntityState.Modified:
+                changes.AppendLine("Properties changed:");
+                bool hasChanges = false;
+
+                foreach (var property in change.OriginalValues.Properties)
+                {
+                    if (property.PropertyInfo?.PropertyType.IsClass == true &&
+                        property.PropertyInfo.PropertyType != typeof(string))
+                        continue;
+
+                    var originalValue = change.OriginalValues[property]?.ToString() ?? "NULL";
+                    var currentValue = change.CurrentValues[property]?.ToString() ?? "NULL";
+
+                    bool valueChanged = originalValue != currentValue;
+
+                    if (valueChanged)
+                    {
+                        hasChanges = true;
+                        changes.AppendLine($"{property.Name}: From '{originalValue}' to '{currentValue}'");
+                    }
+                }
+
+                if (!hasChanges)
+                {
+                    foreach (var property in change.CurrentValues.Properties)
+                    {
+                        if (property.PropertyInfo?.PropertyType.IsClass == true &&
+                            property.PropertyInfo.PropertyType != typeof(string))
+                            continue;
+
+                        var currentValue = change.CurrentValues[property]?.ToString() ?? "NULL";
+                        changes.AppendLine($"{property.Name}: '{currentValue}'");
+                    }
+                }
+                break;
+
+            case EntityState.Deleted:
+                changes.AppendLine("Entity deleted with values:");
+                foreach (var property in change.OriginalValues.Properties)
+                {
+                    if (property.PropertyInfo?.PropertyType.IsClass == true &&
+                        property.PropertyInfo.PropertyType != typeof(string))
+                        continue;
+
+                    var originalValue = change.OriginalValues[property]?.ToString() ?? "NULL";
+                    changes.AppendLine($"{property.Name}: '{originalValue}'");
+                }
+                break;
+        }
+
+        return changes.ToString();
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -80,7 +215,7 @@ public partial class EcommerceDbContext : IdentityDbContext<Customer, IdentityRo
             entity.Property(e => e.ChangeDate).HasDefaultValueSql("(getdate())");
             entity.HasOne(d => d.ChangedByNavigation)
                   .WithMany(p => p.AuditLogs)
-                  .HasForeignKey(e => e.ChangedBy) // Use CustomerId
+                  .HasForeignKey(e => e.ChangedBy)
                   .OnDelete(DeleteBehavior.SetNull)
                   .HasConstraintName("FK__AuditLog__Change__4C6B5938");
         });
