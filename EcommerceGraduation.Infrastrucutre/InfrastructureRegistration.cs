@@ -44,6 +44,9 @@ namespace EcommerceGraduation.Infrastrucutre
             // Register the IOrderService service
             services.AddScoped<IOrderService, OrderService>();
 
+            // Register the IInvoiceService service
+            services.AddScoped<IInvoiceService, InvoiceService>();
+
             // Register the AppDbContext with SQL Server
             services.AddDbContext<EcommerceDbContext>((options) =>
             {

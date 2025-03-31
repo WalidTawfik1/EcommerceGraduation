@@ -30,6 +30,9 @@ public partial class Shipping
 
     public ShippingMethod ShippingMethod { get; set; }
 
+    [Column(TypeName = "decimal(10, 2)")]
+    public decimal ShippingCost { get; set; }
+
     [StringLength(100)]
     public string? Carrier { get; set; } = "DHL";
 

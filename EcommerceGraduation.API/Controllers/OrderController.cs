@@ -20,7 +20,7 @@ namespace EcommerceGraduation.API.Controllers
         }
 
         /// <summary>
-        /// Creates a new order.
+        /// Creates a new order, ShippingMethod should be [Standard, Express, سريع ,عادي].
         /// </summary>
         /// <param name="orderDTO">The order details.</param>
         /// <returns>The created order.</returns>
@@ -48,7 +48,7 @@ namespace EcommerceGraduation.API.Controllers
         /// Gets all orders for the authenticated user.
         /// </summary>
         /// <returns>A list of orders for the user.</returns>
-        [HttpGet("GetAll")]
+        [HttpGet("GetAllOrdersForUser")]
         public async Task<IActionResult> GetAllOrdersForUserAsync()
         {
             var customerClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);

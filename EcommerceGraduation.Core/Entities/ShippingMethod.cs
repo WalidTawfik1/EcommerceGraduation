@@ -9,6 +9,8 @@ namespace EcommerceGraduation.Core.Entities
     public enum ShippingMethod
     {
         Standard,
-        Express
+        Express,
+        عادي,
+        سريع
     }
 }

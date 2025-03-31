@@ -20,12 +20,14 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
         private readonly IUnitofWork _unitofWork;
         private readonly EcommerceDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IInvoiceService _invoiceService;
 
-        public OrderService(IUnitofWork unitofWork, EcommerceDbContext context, IMapper mapper)
+        public OrderService(IUnitofWork unitofWork, EcommerceDbContext context, IMapper mapper, IInvoiceService invoiceService)
         {
             _unitofWork = unitofWork;
             _context = context;
             _mapper = mapper;
+            _invoiceService = invoiceService;
         }
 
         public async Task<Order> CreateOrderAsync(OrderDTO orderDTO, string CustomerCode)
@@ -65,21 +67,20 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
 
 
             var shipping = _mapper.Map<Shipping>(orderDTO.ShippingDTO);
-            decimal shippingCost = 0m;
-            if (shipping.ShippingMethod == ShippingMethod.Standard)
+            if (shipping.ShippingMethod == ShippingMethod.Standard || shipping.ShippingMethod == ShippingMethod.عادي)
             {
                 shipping.EstimatedDeliveryDate = DateOnly.FromDateTime(DateTime.Now.AddDays(4));
-                shippingCost = 20m;
+                shipping.ShippingCost = 20m;
             }
-            else if (shipping.ShippingMethod == ShippingMethod.Express)
+            else if (shipping.ShippingMethod == ShippingMethod.Express || shipping.ShippingMethod == ShippingMethod.سريع)
             {
                 shipping.EstimatedDeliveryDate = DateOnly.FromDateTime(DateTime.Now.AddDays(2));
-                shippingCost = 40m;
+                shipping.ShippingCost = 40m;
             }
             else
             {
                 shipping.EstimatedDeliveryDate = DateOnly.FromDateTime(DateTime.Now.AddDays(4));
-                shippingCost = 20m;
+                shipping.ShippingCost = 20m;
             }
                 shipping.TrackingNumber = Guid.NewGuid().ToString();
             await _context.Shippings.AddAsync(shipping);
@@ -93,10 +94,11 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
 
-            order.TotalAmount += shippingCost;
+            order.TotalAmount += shipping.ShippingCost;
             await _context.SaveChangesAsync();
 
-            await _unitofWork.CartRepository.DeleteCartAsync(orderDTO.CartId);
+           // await _unitofWork.CartRepository.DeleteCartAsync(orderDTO.CartId);
+            await _invoiceService.GenerateInvoiceAsync(order.OrderNumber);
 
             return order;
         }
