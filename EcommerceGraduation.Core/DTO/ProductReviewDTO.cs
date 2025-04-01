@@ -10,15 +10,22 @@ namespace EcommerceGraduation.Core.DTO
     {
         public int ProductId { get; set; }
         public int Rating { get; set; }
-        public string ReviewText { get; set; }
+        public string? ReviewText { get; set; }
     }
 
     public class ReturnProductReviewDTO
     {
         public int Rating { get; set; }
-        public string ReviewText { get; set; }
+        public string? ReviewText { get; set; }
         public DateTime ReviewDate { get; set; }
         public string CustomerName { get; set; }
+    }
+
+    public class  UpdateReviewDTO
+    {
+        public int ReviewId { get; set; }
+        public int Rating { get; set; }
+        public string? ReviewText { get; set; }
     }
 
 }

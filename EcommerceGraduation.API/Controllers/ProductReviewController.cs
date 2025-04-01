@@ -64,5 +64,39 @@ namespace EcommerceGraduation.API.Controllers
             var result = await _productReview.GetAllRatingForProductAsync(productId);
             return Ok(result);
         }
+        /// <summary>
+        /// Update a review for a product.
+        /// </summary>
+        /// <param name="reviewDTO"></param>
+        [HttpPut("UpdateReview")]
+        public async Task<IActionResult> UpdateReview([FromBody] UpdateReviewDTO reviewDTO)
+        {
+            var customerCode = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(customerCode))
+            {
+                return Unauthorized(new APIResponse(401, "Please Login or Register"));
+            }
+
+            var result = await _productReview.UpdateReviewAsync(reviewDTO, customerCode);
+            return result ? Ok(new APIResponse(200, "Review Updated Successfully"))
+                          : NotFound(new APIResponse(404, "Review Not Found or Unauthorized"));
+        }
+        /// <summary>
+        /// Delete a review for a product.
+        /// </summary>
+        /// <param name="reviewId"></param>
+        [HttpDelete("DeleteReview/{reviewId}")]
+        public async Task<IActionResult> DeleteReview(int reviewId)
+        {
+            var customerCode = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(customerCode))
+            {
+                return Unauthorized(new APIResponse(401, "Please Login or Register"));
+            }
+
+            var result = await _productReview.DeleteReviewAsync(reviewId, customerCode);
+            return result ? Ok(new APIResponse(200, "Review Deleted Successfully"))
+                          : NotFound(new APIResponse(404, "Review Not Found or Unauthorized"));
+        }
     }
 }

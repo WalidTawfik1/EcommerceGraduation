@@ -57,6 +57,37 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
 
         }
 
+        public async Task<bool> DeleteReviewAsync(int reviewId, string CustomerCode)
+        {
+            var customer = await _userManager.FindByIdAsync(CustomerCode);
+            var review = await _context.ProductReviews.FirstOrDefaultAsync(m => m.ReviewId == reviewId && m.CustomerCode == customer.Id);
+
+            if (review == null)
+            {
+                return false; 
+            }
+
+            _context.ProductReviews.Remove(review);
+            await _context.SaveChangesAsync();
+
+            var product = await _context.Products.FirstOrDefaultAsync(m => m.ProductId == review.ProductId);
+            var ratings = await _context.ProductReviews.AsNoTracking().Where(m => m.ProductId == product.ProductId).ToListAsync();
+
+            if (ratings.Count > 0)
+            {
+                double? average = ratings.Average(m => m.Rating);
+                double roundedReview = Math.Round((double)(average * 2), MidpointRounding.AwayFromZero) / 2;
+                product.Rating = roundedReview;
+            }
+            else
+            {
+                product.Rating = null;
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<IReadOnlyList<ReturnProductReviewDTO>> GetAllRatingForProductAsync(int productId)
         {
             var ratings = await _context.ProductReviews.Include(m => m.CustomerCodeNavigation).AsNoTracking().Where(m => m.ProductId == productId).ToListAsync();
@@ -68,6 +99,37 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
                 ReviewText = m.ReviewText,
                 ReviewDate = m.ReviewDate.Value
             }).ToList();
+        }
+
+        public async Task<bool> UpdateReviewAsync(UpdateReviewDTO updateReviewDTO, string CustomerCode)
+        {
+            var customer = await _userManager.FindByIdAsync(CustomerCode);
+            var review = await _context.ProductReviews.FirstOrDefaultAsync(m => m.ReviewId == updateReviewDTO.ReviewId && m.CustomerCode == customer.Id);
+
+            if (review == null)
+            {
+                return false;
+            }
+
+            review.Rating = updateReviewDTO.Rating;
+            if (!string.IsNullOrWhiteSpace(updateReviewDTO.ReviewText))
+            {
+                review.ReviewText = updateReviewDTO.ReviewText;
+            }
+
+            _context.ProductReviews.Update(review);
+            await _context.SaveChangesAsync();
+
+            // Recalculate product rating
+            var product = await _context.Products.FirstOrDefaultAsync(m => m.ProductId == review.ProductId);
+            var ratings = await _context.ProductReviews.AsNoTracking().Where(m => m.ProductId == product.ProductId).ToListAsync();
+
+            product.Rating = ratings.Any()
+                ? Math.Round((double)(ratings.Average(m => m.Rating) * 2), MidpointRounding.AwayFromZero) / 2
+                : updateReviewDTO.Rating;
+
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

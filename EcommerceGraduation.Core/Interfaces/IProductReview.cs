@@ -11,5 +11,7 @@ namespace EcommerceGraduation.Core.Interfaces
     {
         Task<bool> AddRatingAsync(ProductReviewDTO reviewDTO, string CustomerCode);
         Task<IReadOnlyList<ReturnProductReviewDTO>> GetAllRatingForProductAsync(int productId);
+        Task<bool> UpdateReviewAsync(UpdateReviewDTO updateReviewDTO, string CustomerCode);
+        Task<bool> DeleteReviewAsync(int reviewId, string CustomerCode);
     }
 }
