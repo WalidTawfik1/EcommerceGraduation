@@ -16,12 +16,13 @@ public partial class ProductReview
     [Column("ProductID")]
     public int? ProductId { get; set; }
 
+    [Range(1, 5)]
     public int? Rating { get; set; }
 
     public string? ReviewText { get; set; }
 
     [Column(TypeName = "datetime")]
-    public DateTime? ReviewDate { get; set; }
+    public DateTime? ReviewDate { get; set; } = DateTime.Now;
 
     [StringLength(20)]
     public string CustomerCode { get; set; } = null!;

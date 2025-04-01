@@ -15,6 +15,10 @@ namespace EcommerceGraduation.API.Controllers
         {
             _invoiceService = invoiceService;
         }
+        /// <summary>
+        /// Get all invoices for the authenticated user.
+        /// </summary>
+        /// <returns> A list of invoices for the authenticated user.</returns>
         [HttpGet("GetAllInvoicesForUser")]
         public async Task<IActionResult> GetAllInvoicesForUserAsync()
         {
@@ -34,7 +38,11 @@ namespace EcommerceGraduation.API.Controllers
                 return StatusCode(500, new { message = ex.Message, innerException = ex.InnerException?.Message });
             }
         }
-
+        /// <summary>
+        /// Get an invoice by its id.
+        /// </summary>
+        /// <param name="invoiceId">The ID of the invoice to retrieve.</param>
+        /// <returns>The invoice with the specified ID.</returns>
         [HttpGet("GetInvoiceById")]
         public async Task<IActionResult> GetInvoiceByIdAsync(int invoiceId)
         {

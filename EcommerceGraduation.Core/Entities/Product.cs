@@ -44,6 +44,8 @@ public partial class Product
     [StringLength(20)]
     public string BrandCode { get; set; } = null!;
 
+    public double? Rating { get; set; }
+
     [ForeignKey("BrandCode")]
     [InverseProperty("Products")]
     public virtual Brand BrandCodeNavigation { get; set; } = null!;
