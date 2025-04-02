@@ -2,6 +2,7 @@
 using EcommerceGraduation.API.Helper;
 using EcommerceGraduation.Core.DTO;
 using EcommerceGraduation.Core.Interfaces;
+using EcommerceGraduation.Infrastrucutre.Repositores;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -94,6 +95,102 @@ namespace EcommerceGraduation.API.Controllers
                 return BadRequest(new APIResponse(400, result));
             }
             return Ok(new APIResponse(200, result));
+        }
+        /// <summary>
+        /// Logs out a user.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+            Response.Cookies.Delete("token");
+            return Ok(new APIResponse(200, "Logout Successfully"));
+        }
+        /// <summary>
+        /// Gets the profile of the authenticated user.
+        /// </summary>
+        /// <returns>User profile</returns>
+        [HttpGet("Profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            try
+            {
+                // The repository method will get the ID from the authenticated user
+                var customerId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(customerId))
+                {
+                    return Unauthorized("User not authenticated, Please login or register.");
+                }
+
+                var customer = await work.CustomerRepository.GetCustomerByIdAsync(customerId);
+                if (customer == null)
+                {
+                    return NotFound($"Customer profile not found.");
+                }
+
+                return Ok(customer);
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Deletes the account of the authenticated user.
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete("DeleteAccount")]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            try
+            {
+                var customerId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(customerId))
+                {
+                    return Unauthorized("User not authenticated, Please login or register.");
+                }
+
+                var result = await work.CustomerRepository.DeleteCustomerAsync(customerId);
+                if (!result)
+                {
+                    return NotFound($"Customer with ID {customerId} not found.");
+                }
+
+                return Ok(new APIResponse(200, "Account deleted successfully"));
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+        /// <summary>
+        /// Updates the profile of the authenticated user.
+        /// </summary>
+        /// <param name="customerDTO"></param>
+        /// <returns></returns>
+        [HttpPut("UpdateProfile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] CustomerDTO customerDTO)
+        {
+            try
+            {
+                var customerId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(customerId))
+                {
+                    return Unauthorized("User not authenticated, Please login or register.");
+                }
+
+                var updatedCustomer = await work.CustomerRepository.UpdateCustomerAsync(customerId, customerDTO);
+                return Ok(updatedCustomer);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }

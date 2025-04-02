@@ -1,4 +1,5 @@
 using EcommerceGraduation.API.Middlewares;
+using EcommerceGraduation.Core.Interfaces;
 using EcommerceGraduation.Infrastrucutre;
 using Microsoft.OpenApi.Models;
 using System.Reflection;

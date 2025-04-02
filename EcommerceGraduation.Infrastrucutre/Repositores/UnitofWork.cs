@@ -3,6 +3,7 @@ using EcommerceGraduation.Core.Entities;
 using EcommerceGraduation.Core.Interfaces;
 using EcommerceGraduation.Core.Services;
 using EcommerceGraduation.Infrastructure.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using StackExchange.Redis;
 using System;
@@ -38,6 +39,8 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
 
         public IAuthentication Authentication { get; }
 
+        public ICustomerRepository CustomerRepository { get; }
+
         public UnitofWork(EcommerceDbContext context, IProductImageManagmentService imageManagmentService, IMapper mapper,
             IConnectionMultiplexer redis, UserManager<Customer> userManager, IEmailService emailService, SignInManager<Customer> signInManager, IGenerateToken generateToken)
         {
@@ -56,7 +59,9 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             CartRepository = new CartRepository(_redis);
             SubCategoryRepository = new SubCategoryRepository(_context);
             BrandRepository = new BrandRepositroy(_context);
-            Authentication = new AuthenticationRepository(_userManager, _emailService, _signInManager,_generateToken);
+            Authentication = new AuthenticationRepository(_userManager, _emailService, _signInManager, _generateToken);
+            CustomerRepository = new CustomerRepository(_context, _mapper);
+
         }
     }
 }

@@ -17,7 +17,7 @@ namespace EcommerceGraduation.API.Controllers
             _productReview = productReview;
         }
         /// <summary>
-        /// Add a review for a product.
+        /// Add a review for a product, Rating should be from 1 to 5.
         /// </summary>
         /// <param name="reviewDTO"></param>
         [HttpPost("AddProductReview")]
@@ -48,7 +48,7 @@ namespace EcommerceGraduation.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new APIResponse(500, "An unexpected error occurred. Please try again later."));
+                return StatusCode(500, new APIResponse(500, $"An unexpected error occurred,{ex.Message}."));
             }
         }
 

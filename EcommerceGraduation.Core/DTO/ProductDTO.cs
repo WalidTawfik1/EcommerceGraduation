@@ -27,8 +27,8 @@ namespace EcommerceGraduation.Core.DTO
       public string BrandName { get; set; }
 
       public int StockQuantity { get; set; }
-
-
+    
+      public double Rating { get; set; }
     }
 
     public record PhotoDTO

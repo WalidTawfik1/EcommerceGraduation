@@ -60,7 +60,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
                 {
                     return string.Join(", ", result.Errors.Select(e => e.Description));
                 }
-
+                await userManager.AddToRoleAsync(customer, "Customer");
 
                 // send email activiation
                 string token = await userManager.GenerateEmailConfirmationTokenAsync(customer);
