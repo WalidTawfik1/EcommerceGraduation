@@ -4,6 +4,7 @@ using EcommerceGraduation.Core.Services;
 using EcommerceGraduation.Infrastructure.Data;
 using EcommerceGraduation.Infrastrucutre.Repositores;
 using EcommerceGraduation.Infrastrucutre.Repositores.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
@@ -12,12 +13,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -107,6 +110,14 @@ namespace EcommerceGraduation.Infrastrucutre
                         return Task.CompletedTask;
                     }
                 };
+
+            }).AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
+                googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+                googleOptions.CallbackPath = "/signin-google";
+                googleOptions.SaveTokens = true;
+
             });
 
             // Allow user tracking

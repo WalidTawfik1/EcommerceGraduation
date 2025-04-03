@@ -1,10 +1,15 @@
 ﻿using AutoMapper;
 using EcommerceGraduation.API.Helper;
 using EcommerceGraduation.Core.DTO;
+using EcommerceGraduation.Core.Entities;
 using EcommerceGraduation.Core.Interfaces;
+using EcommerceGraduation.Core.Services;
+using EcommerceGraduation.Infrastructure.Data;
 using EcommerceGraduation.Infrastrucutre.Repositores;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EcommerceGraduation.API.Controllers
 {
@@ -13,8 +18,18 @@ namespace EcommerceGraduation.API.Controllers
     /// </summary>
     public class AccountController : BaseController
     {
-        public AccountController(IUnitofWork work, IMapper mapper) : base(work, mapper)
+        private readonly UserManager<Customer> _userManager;
+        private readonly SignInManager<Customer> _signInManager;
+        private readonly IConfiguration _configuration;
+        private readonly IGenerateToken _generateToken;
+        private readonly EcommerceDbContext _context;
+        public AccountController(IUnitofWork work, IMapper mapper, UserManager<Customer> userManager, SignInManager<Customer> signInManager, IConfiguration configuration, IGenerateToken generateToken, EcommerceDbContext context) : base(work, mapper)
         {
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _configuration = configuration;
+            _generateToken = generateToken;
+            _context = context;
         }
 
         /// <summary>
@@ -192,5 +207,77 @@ namespace EcommerceGraduation.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        /// <summary>
+        /// Initiates Google login, Redirect automaticlly to google-response.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("google-login")]
+        public IActionResult GoogleLogin()
+        
+        {
+            var redirectUrl = Url.Action("GoogleResponse", "Account", null, Request.Scheme);
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+            return Challenge(properties, "Google");
+        }
+        /// <summary>
+        /// Handles the Google login response.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("google-response")]
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return BadRequest("Error loading external login information.");
+            }
+
+            // Look for the user in your application
+            var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+            if (user == null)
+            {
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                if (string.IsNullOrEmpty(email))
+                {
+                    return BadRequest("Google account did not provide an email.");
+                }
+
+                // Check if user already exists by email
+                user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    user = new Customer
+                    {
+                        UserName = info.Principal.Identity?.Name?.Replace(" ", "") ?? email,
+                        Name = info.Principal.FindFirstValue(ClaimTypes.GivenName) ?? "Unknown",
+                        Email = email,
+                        EmailConfirmed = true,
+                        UserType = "Customer",
+                        CreatedAt = DateTime.Now,
+                    };
+
+                    var result = await _userManager.CreateAsync(user);
+                    if (!result.Succeeded)
+                    {
+                        return BadRequest(new { Message = "User creation failed.", Errors = result.Errors });
+                    }
+                }
+
+                // Link Google login with user
+                var loginResult = await _userManager.AddLoginAsync(user, info);
+                if (!loginResult.Succeeded)
+                {
+                    return BadRequest(new { Message = "Failed to associate Google login with user.", Errors = loginResult.Errors });
+                }
+            }
+
+            // Sign in the user using cookie authentication
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            // Generate JWT token
+            var token = _generateToken.GetAndCreateToken(user);
+            return Ok(new { Token = token });
+        }
+
     }
 }

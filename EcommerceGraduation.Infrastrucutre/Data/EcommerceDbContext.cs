@@ -179,8 +179,8 @@ public partial class EcommerceDbContext : IdentityDbContext<Customer, IdentityRo
             optionsBuilder.UseSqlServer(
                 _configuration["ConnectionStrings:EcommerceDatabase"],
                 options => options.EnableRetryOnFailure(
-                    maxRetryCount: 5,
-                    maxRetryDelay: TimeSpan.FromSeconds(10),
+                    maxRetryCount: 10,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
                     errorNumbersToAdd: null
                 ));
         }
