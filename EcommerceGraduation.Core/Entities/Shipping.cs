@@ -39,6 +39,7 @@ public partial class Shipping
     [StringLength(50)]
     public string? TrackingNumber { get; set; }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public Status ShippingStatus { get; set; } = Status.Pending;
 
     public DateOnly? EstimatedDeliveryDate { get; set; }

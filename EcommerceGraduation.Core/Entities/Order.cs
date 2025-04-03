@@ -17,8 +17,10 @@ public partial class Order
     [Column(TypeName = "datetime")]
     public DateTime? OrderDate { get; set; } = DateTime.Now;
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public Status OrderStatus { get; set; } = Status.Pending;
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public Status PaymentStatus { get; set; } = Status.Pending;
 
     [StringLength(20)]

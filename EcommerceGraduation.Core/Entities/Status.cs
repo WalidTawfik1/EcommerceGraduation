@@ -10,7 +10,7 @@ namespace EcommerceGraduation.Core.Entities
     {
         Pending,
         PaymentReceived,
-        PaymentFaild,
+        PaymentFailed,
         Shipped,
         Delivered,
         Cancelled,

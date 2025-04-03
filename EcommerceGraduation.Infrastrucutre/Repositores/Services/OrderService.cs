@@ -5,6 +5,7 @@ using EcommerceGraduation.Core.Interfaces;
 using EcommerceGraduation.Core.Services;
 using EcommerceGraduation.Core.Sharing;
 using EcommerceGraduation.Infrastructure.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -65,8 +66,50 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             }
             order.OrderDetails = orderDetails;
 
-
             var shipping = _mapper.Map<Shipping>(orderDTO.ShippingDTO);
+
+            // Check if user wants to use their profile address
+            if (orderDTO.ShippingDTO.UseProfileAddress)
+            {
+                var customer = await _unitofWork.CustomerRepository.GetCustomerByIdAsync(CustomerCode);
+                if (customer == null)
+                {
+                    throw new InvalidOperationException("Customer not found.");
+                }
+                if (string.IsNullOrEmpty(customer.Address) ||
+                    string.IsNullOrEmpty(customer.City) ||
+                    string.IsNullOrEmpty(customer.Country))
+                {
+                    throw new InvalidOperationException("No address found in your profile. Please provide a shipping address.");
+                }
+                shipping.Address = customer.Address;
+                shipping.City = customer.City;
+                shipping.Country = customer.Country;
+                shipping.PostalCode = customer.PostalCode;
+            }
+            else
+            {
+                shipping.Address = orderDTO.ShippingDTO.Address;
+                shipping.City = orderDTO.ShippingDTO.City;
+                shipping.Country = orderDTO.ShippingDTO.Country;
+                shipping.PostalCode = orderDTO.ShippingDTO.PostalCode;
+            }
+
+            // If the user wants to update their profile with this address
+            if (orderDTO.ShippingDTO.UpdateProfileAddress)
+            {
+                var customer = await _unitofWork.CustomerRepository.GetCustomerByIdAsync(CustomerCode);
+                if (customer != null)
+                {
+                    customer.Address = orderDTO.ShippingDTO.Address;
+                    customer.City = orderDTO.ShippingDTO.City;
+                    customer.Country = orderDTO.ShippingDTO.Country;
+                    customer.PostalCode = orderDTO.ShippingDTO.PostalCode;
+
+                    await _unitofWork.CustomerRepository.UpdateCustomerAsync(CustomerCode, customer);
+                }
+            }
+
             if (shipping.ShippingMethod == ShippingMethod.Standard || shipping.ShippingMethod == ShippingMethod.عادي)
             {
                 shipping.EstimatedDeliveryDate = DateOnly.FromDateTime(DateTime.Now.AddDays(4));
@@ -82,7 +125,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
                 shipping.EstimatedDeliveryDate = DateOnly.FromDateTime(DateTime.Now.AddDays(4));
                 shipping.ShippingCost = 20m;
             }
-                shipping.TrackingNumber = Guid.NewGuid().ToString();
+            shipping.TrackingNumber = Guid.NewGuid().ToString();
             await _context.Shippings.AddAsync(shipping);
             await _context.SaveChangesAsync();
 
@@ -97,7 +140,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             order.TotalAmount += shipping.ShippingCost;
             await _context.SaveChangesAsync();
 
-           // await _unitofWork.CartRepository.DeleteCartAsync(orderDTO.CartId);
+            // await _unitofWork.CartRepository.DeleteCartAsync(orderDTO.CartId);
             await _invoiceService.GenerateInvoiceAsync(order.OrderNumber);
 
             return order;

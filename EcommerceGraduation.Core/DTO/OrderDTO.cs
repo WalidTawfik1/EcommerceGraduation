@@ -19,6 +19,8 @@ namespace EcommerceGraduation.Core.DTO
         public string Country { get; set; }
         public string PostalCode { get; set; }
         public string ShippingMethod { get; set; }
+        public bool UseProfileAddress { get; set; } = false;
+        public bool UpdateProfileAddress { get; set; } = false;
 
     }
 }
