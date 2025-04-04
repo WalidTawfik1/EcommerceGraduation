@@ -31,14 +31,27 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
 
         public async Task<bool> DeleteCustomerAsync(string Id)
         {
-            var customer = await _context.Customers.FindAsync(Id);
-            if (customer == null)
+            try
             {
-                return false;
+                var customer = await _context.Customers.FindAsync(Id);
+                if (customer == null)
+                {
+                    return false;
+                }
+                _context.Customers.Remove(customer);
+                await _context.SaveChangesAsync();
+                return true;
             }
-            _context.Customers.Remove(customer);
-            await _context.SaveChangesAsync();
-            return true;
+            catch (DbUpdateException ex)
+            {
+                var innerException = ex.InnerException;
+                var innerExceptionMessage = innerException?.Message ?? "No inner exception details";
+
+                Console.WriteLine($"Database update error: {ex.Message}");
+                Console.WriteLine($"Inner exception: {innerExceptionMessage}");
+
+                throw;
+            }
         }
 
         public async Task<CustomerDTO> GetCustomerByIdAsync(string Id)

@@ -47,15 +47,31 @@ public partial class EcommerceDbContext : IdentityDbContext<Customer, IdentityRo
     {
         try
         {
-            // Collect modified entities
             var modifiedEntities = ChangeTracker.Entries()
-                .Where(x => x.State == EntityState.Modified || x.State == EntityState.Added || x.State == EntityState.Deleted)
-                .Where(x => !(x.Entity is AuditLog))
+                .Where(x => (x.State == EntityState.Modified || x.State == EntityState.Added || x.State == EntityState.Deleted)
+                            && !(x.Entity is AuditLog))
                 .ToList();
 
-            var userId = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "System";
+            // Try to get userId from HttpContext
+            var userId = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // Create audit logs
+            // If userId is null, check if we're inserting a new IdentityUserRole
+            if (userId == null)
+            {
+                var newUser = modifiedEntities.FirstOrDefault(e => e.State == EntityState.Added && e.Entity is Customer);
+                if (newUser != null)
+                {
+                    userId = (newUser.Entity as Customer)?.Id;
+                }
+
+                // Also check if we're inserting an IdentityUserRole and fetch the UserId from it
+                var newUserRole = modifiedEntities.FirstOrDefault(e => e.State == EntityState.Added && e.Entity is IdentityUserRole<string>);
+                if (newUserRole != null)
+                {
+                    userId = (newUserRole.Entity as IdentityUserRole<string>)?.UserId;
+                }
+            }
+
             foreach (var change in modifiedEntities)
             {
                 string action = MapEntityStateToAction(change.State);
@@ -64,7 +80,7 @@ public partial class EcommerceDbContext : IdentityDbContext<Customer, IdentityRo
                 {
                     TableName = change.Entity.GetType().Name,
                     Action = action,
-                    ChangedBy = userId,
+                    ChangedBy = userId, // Ensure correct userId is assigned
                     ChangeDate = DateTime.Now,
                     Changes = GetChanges(change)
                 };
@@ -85,6 +101,8 @@ public partial class EcommerceDbContext : IdentityDbContext<Customer, IdentityRo
             throw;
         }
     }
+
+
 
     private string MapEntityStateToAction(EntityState state)
     {

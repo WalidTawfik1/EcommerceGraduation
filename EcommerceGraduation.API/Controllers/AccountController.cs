@@ -158,7 +158,7 @@ namespace EcommerceGraduation.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
+        /*
         /// <summary>
         /// Deletes the account of the authenticated user.
         /// </summary>
@@ -187,7 +187,7 @@ namespace EcommerceGraduation.API.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-        }
+        }*/
         /// <summary>
         /// Updates the profile of the authenticated user.
         /// </summary>
