@@ -16,6 +16,7 @@ namespace EcommerceGraduation.Core.Entities
         Cancelled,
         Success,
         Failed,
-        Refunded
+        Refunded,
+        Paid
     }
 }

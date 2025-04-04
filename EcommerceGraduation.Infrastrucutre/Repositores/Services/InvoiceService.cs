@@ -3,6 +3,7 @@ using EcommerceGraduation.Core.DTO;
 using EcommerceGraduation.Core.Entities;
 using EcommerceGraduation.Core.Interfaces;
 using EcommerceGraduation.Core.Services;
+using EcommerceGraduation.Core.Sharing;
 using EcommerceGraduation.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
 {
@@ -46,14 +48,23 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             return invoice;
         }
 
-        public async Task<IReadOnlyList<InvoiceDTO>> GetAllOrdersForUserAsync(string CustomerCode)
+        public async Task<IReadOnlyList<InvoiceDTO>> GetAllInvoices(PageSkip page)
+        {
+            var invoices = _context.Invoices.AsNoTracking();
+            invoices = invoices.Skip((page.pagenum - 1) * page.pagesize).Take(page.pagesize);
+
+            var result = _mapper.Map<IReadOnlyList<InvoiceDTO>>(invoices);
+            return result;
+        }
+
+        public async Task<IReadOnlyList<InvoiceDTO>> GetAllInvoicesForUserAsync(string CustomerCode)
         {
             var invoices = await _context.Invoices.Where(i => i.CustomerCode == CustomerCode).ToListAsync();
             var result = _mapper.Map<IReadOnlyList<InvoiceDTO>>(invoices);
             return result;
         }
 
-        public async Task<InvoiceDTO> GetOrderByIdAsync(int invoiceId, string CustomerCode)
+        public async Task<InvoiceDTO> GetInvoiceByIdAsync(int invoiceId, string CustomerCode)
         {
             var invoice = await _context.Invoices.Where(i => i.InvoiceId == invoiceId && i.CustomerCode == CustomerCode).FirstOrDefaultAsync();
             if (invoice == null)

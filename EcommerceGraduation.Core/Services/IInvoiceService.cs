@@ -1,5 +1,6 @@
 ﻿using EcommerceGraduation.Core.DTO;
 using EcommerceGraduation.Core.Entities;
+using EcommerceGraduation.Core.Sharing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,8 @@ namespace EcommerceGraduation.Core.Services
     public interface IInvoiceService
     {
         Task <Invoice> GenerateInvoiceAsync(string orderNumber);
-        Task<IReadOnlyList<InvoiceDTO>> GetAllOrdersForUserAsync(string CustomerCode);
-        Task<InvoiceDTO> GetOrderByIdAsync(int invoiceId, string CustomerCode);
+        Task<IReadOnlyList<InvoiceDTO>> GetAllInvoicesForUserAsync(string CustomerCode);
+        Task<InvoiceDTO> GetInvoiceByIdAsync(int invoiceId, string CustomerCode);
+        Task<IReadOnlyList<InvoiceDTO>> GetAllInvoices(PageSkip page);
     }
 }

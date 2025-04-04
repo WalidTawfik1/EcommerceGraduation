@@ -1,8 +1,10 @@
 ﻿using EcommerceGraduation.Core.DTO;
 using EcommerceGraduation.Core.Services;
+using EcommerceGraduation.Core.Sharing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
 
 namespace EcommerceGraduation.API.Controllers
@@ -77,7 +79,7 @@ namespace EcommerceGraduation.API.Controllers
         /// <param name="orderNumber">The order number.</param>
         /// <returns>The order with the specified number.</returns>
         [Authorize]
-        [HttpGet("get-order-by-id")]
+        [HttpGet("get-order-by-id-for-user")]
         public async Task<IActionResult> GetOrderByIdAsync(string orderNumber)
         {
             var customerClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
@@ -90,6 +92,24 @@ namespace EcommerceGraduation.API.Controllers
             {
                 var order = await _orderService.GetOrderByIdAsync(orderNumber, customerCode);
                 return Ok(order);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message, innerException = ex.InnerException?.Message });
+            }
+        }
+        /// <summary>
+        /// Gets all orders for admin.
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(Roles = "Admin")]
+        [HttpGet("get-all-orders")]
+        public async Task<IActionResult> GetAllOrders([FromQuery] PageSkip page)
+        {
+            try
+            {
+                var orders = await _orderService.GetAllOrders(page);
+                return Ok(orders);
             }
             catch (Exception ex)
             {

@@ -1,5 +1,6 @@
 ﻿using EcommerceGraduation.Core.DTO;
 using EcommerceGraduation.Core.Entities;
+using EcommerceGraduation.Core.Sharing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace EcommerceGraduation.Core.Services
         Task<Order> CreateOrderAsync(OrderDTO orderDTO,string CustomerCode);
         Task<IReadOnlyList<ReturnOrderDTO>> GetAllOrdersForUserAsync(string CustomerCode);
         Task<ReturnOrderDTO> GetOrderByIdAsync(string orderNumber,string CustomerCode);
+        Task<IReadOnlyList<ReturnOrderDTO>> GetAllOrders(PageSkip page);
 
     }
 }

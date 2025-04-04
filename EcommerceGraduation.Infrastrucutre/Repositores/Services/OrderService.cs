@@ -146,6 +146,19 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             return order;
         }
 
+        public async Task<IReadOnlyList<ReturnOrderDTO>> GetAllOrders(PageSkip page)
+        {
+            var orders = _context.Orders
+                .Include(o => o.OrderDetails)
+                .Include(o => o.Shippings)
+                .AsNoTracking();
+            orders = orders.Skip((page.pagenum - 1) * page.pagesize).Take(page.pagesize);
+
+            var result = _mapper.Map<IReadOnlyList<ReturnOrderDTO>>(orders);
+
+            return result;
+        }
+
 
         public async Task<IReadOnlyList<ReturnOrderDTO>> GetAllOrdersForUserAsync(string CustomerCode)
         {
