@@ -1,6 +1,7 @@
 ﻿using EcommerceGraduation.API.Helper;
 using EcommerceGraduation.Core.DTO;
 using EcommerceGraduation.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -20,7 +21,8 @@ namespace EcommerceGraduation.API.Controllers
         /// Add a review for a product, Rating should be from 1 to 5.
         /// </summary>
         /// <param name="reviewDTO"></param>
-        [HttpPost("AddProductReview")]
+        [Authorize]
+        [HttpPost("add-product-review")]
         public async Task<IActionResult> AddRating([FromBody] ProductReviewDTO reviewDTO)
         {
             if (reviewDTO == null)
@@ -58,7 +60,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="productId"></param>
         /// <returns>A list of product reviews.</returns>
-        [HttpGet("GetProductReview/{productId}")]
+        [AllowAnonymous]
+        [HttpGet("get-product-review/{productId}")]
         public async Task<IActionResult> GetAllRatingForProduct(int productId)
         {
             var result = await _productReview.GetAllRatingForProductAsync(productId);
@@ -68,7 +71,8 @@ namespace EcommerceGraduation.API.Controllers
         /// Update a review for a product.
         /// </summary>
         /// <param name="reviewDTO"></param>
-        [HttpPut("UpdateReview")]
+        [Authorize]
+        [HttpPut("update-product-review")]
         public async Task<IActionResult> UpdateReview([FromBody] UpdateReviewDTO reviewDTO)
         {
             var customerCode = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -85,7 +89,8 @@ namespace EcommerceGraduation.API.Controllers
         /// Delete a review for a product.
         /// </summary>
         /// <param name="reviewId"></param>
-        [HttpDelete("DeleteReview/{reviewId}")]
+        [Authorize]
+        [HttpDelete("delete-product-review/{reviewId}")]
         public async Task<IActionResult> DeleteReview(int reviewId)
         {
             var customerCode = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

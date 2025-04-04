@@ -53,6 +53,9 @@ namespace EcommerceGraduation.Infrastrucutre
             // Register the IProductReview service
             services.AddScoped<IProductReview, ProductReviewRepository>();
 
+            // Register the StatusUpdater service
+            services.AddHostedService<StatusUpdater>();
+
             // Register the AppDbContext with SQL Server
             services.AddDbContext<EcommerceDbContext>((options) =>
             {

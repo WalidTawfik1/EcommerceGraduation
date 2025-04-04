@@ -2,6 +2,7 @@
 using EcommerceGraduation.API.Helper;
 using EcommerceGraduation.Core.Entities;
 using EcommerceGraduation.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +22,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="id">The cart ID.</param>
         /// <returns>The shopping cart with the specified ID.</returns>
-        [HttpGet("GetBasketById/{id}")]
+        [AllowAnonymous]
+        [HttpGet("get-cart-by-id/{id}")]
         public async Task<ActionResult> GetBasketById(string id)
         {
             var result = await work.CartRepository.GetCartAsync(id);
@@ -33,7 +35,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="basket">The cart details.</param>
         /// <returns>The updated shopping cart.</returns>
-        [HttpPost("UpdateBasket")]
+        [AllowAnonymous]
+        [HttpPost("update-cart")]
         public async Task<ActionResult> UpdateBasket(Cart basket)
         {
             var result = await work.CartRepository.UpdateCartAsync(basket);
@@ -45,7 +48,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="id">The cart ID.</param>
         /// <returns>A response indicating the result of the deletion.</returns>
-        [HttpDelete("DeleteBasket/{id}")]
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("delete-cart/{id}")]
         public async Task<ActionResult> DeleteBasket(string id)
         {
             var result = await work.CartRepository.DeleteCartAsync(id);

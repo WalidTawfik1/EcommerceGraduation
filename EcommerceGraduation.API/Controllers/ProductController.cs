@@ -3,6 +3,7 @@ using EcommerceGraduation.API.Helper;
 using EcommerceGraduation.Core.DTO;
 using EcommerceGraduation.Core.Interfaces;
 using EcommerceGraduation.Core.Sharing;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +23,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="productParams">Parameters for pagination and filtering.</param>
         /// <returns>A paginated list of products.</returns>
-        [HttpGet("GetAll")]
+        [AllowAnonymous]
+        [HttpGet("get-all-products")]
         public async Task<IActionResult> GetAll([FromQuery] ProductParams productParams)
         {
             try
@@ -42,7 +44,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="id">The ID of the product.</param>
         /// <returns>The product with the specified ID.</returns>
-        [HttpGet("GetById/{id}")]
+        [AllowAnonymous]
+        [HttpGet("get-product-by-id/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             try
@@ -67,7 +70,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="productDTO">The product details.</param>
         /// <returns>A response indicating the result of the addition.</returns>
-        [HttpPost("Add")]
+        [Authorize(Roles = "Admin")]
+        [HttpPost("add-product")]
         public async Task<IActionResult> Add(AddProductDTO productDTO)
         {
             try
@@ -86,7 +90,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="productDTO">The product details.</param>
         /// <returns>A response indicating the result of the update.</returns>
-        [HttpPut("Update")]
+        [Authorize(Roles = "Admin")]
+        [HttpPut("update-product")]
         public async Task<IActionResult> Update(UpdateProductDTO productDTO)
         {
             try
@@ -105,7 +110,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="id">The ID of the product.</param>
         /// <returns>A response indicating the result of the deletion.</returns>
-        [HttpDelete("Delete/{id}")]
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("delete-product/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             try

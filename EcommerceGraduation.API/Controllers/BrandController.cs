@@ -3,6 +3,7 @@ using EcommerceGraduation.API.Helper;
 using EcommerceGraduation.Core.DTO;
 using EcommerceGraduation.Core.Entities;
 using EcommerceGraduation.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +22,8 @@ namespace EcommerceGraduation.API.Controllers
         /// Gets all brands.
         /// </summary>
         /// <returns>A list of all brands.</returns>
-        [HttpGet("GetAll")]
+        [AllowAnonymous]
+        [HttpGet("get-all-brands")]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -44,7 +46,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="code">The brand code.</param>
         /// <returns>The brand with the specified code.</returns>
-        [HttpGet("GetByCode/{code}")]
+        [AllowAnonymous]
+        [HttpGet("get-by-brand-code/{code}")]
         public async Task<IActionResult> GetByCode(string code)
         {
             try
@@ -67,7 +70,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="addBrandDTO">The brand details.</param>
         /// <returns>A response indicating the result of the addition.</returns>
-        [HttpPost("Add")]
+        [Authorize(Roles = "Admin")]
+        [HttpPost("add-brand")]
         public async Task<IActionResult> Add(AddBrandDTO addBrandDTO)
         {
             try
@@ -87,7 +91,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="updateBrandDTO">The brand details.</param>
         /// <returns>A response indicating the result of the update.</returns>
-        [HttpPut("Update")]
+        [Authorize(Roles = "Admin")]
+        [HttpPut("update-brand")]
         public async Task<IActionResult> Update(UpdateBrandDTO updateBrandDTO)
         {
             try
@@ -107,7 +112,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="code">The brand code.</param>
         /// <returns>A response indicating the result of the deletion.</returns>
-        [HttpDelete("Delete/{code}")]
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("delete-brand/{code}")]
         public async Task<IActionResult> Delete(string code)
         {
             try

@@ -99,14 +99,14 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
                 return null;
             }
             var customer = await userManager.FindByEmailAsync(loginDTO.Email);
-            /*
+            
             if(!customer.EmailConfirmed)
             {
                 string token = await userManager.GenerateEmailConfirmationTokenAsync(customer);
                 await SendEmail(customer.Email, token, "Active", "Email Activation", "Please Active your email, click on button to active");
                 return "Please Active your email first, we have sent the acivation link to your email";
 
-            }*/
+            }
             var result = await signInManager.CheckPasswordSignInAsync(customer, loginDTO.Password, true);
             if (result.Succeeded)
             {

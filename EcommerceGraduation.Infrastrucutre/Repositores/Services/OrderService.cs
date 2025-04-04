@@ -140,7 +140,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             order.TotalAmount += shipping.ShippingCost;
             await _context.SaveChangesAsync();
 
-            // await _unitofWork.CartRepository.DeleteCartAsync(orderDTO.CartId);
+            await _unitofWork.CartRepository.DeleteCartAsync(orderDTO.CartId);
             await _invoiceService.GenerateInvoiceAsync(order.OrderNumber);
 
             return order;

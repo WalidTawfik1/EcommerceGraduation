@@ -85,6 +85,32 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
                 query = query.Where(m => m.CategoryCode == productParams.categoryCode);
             }
 
+            //filter by subcategoryId
+            if (!string.IsNullOrEmpty(productParams.subCategoryCode))
+            {
+                query = query.Where(m => m.SubCategoryCode == productParams.subCategoryCode);
+            }
+
+            //filter by brandId
+            if (!string.IsNullOrEmpty(productParams.brandCode))
+            {
+                query = query.Where(m => m.BrandCode == productParams.brandCode);
+            }
+
+            //filter by price
+            if (productParams.minPrice != null && productParams.maxPrice != null)
+            {
+                query = query.Where(m => m.Price >= productParams.minPrice && m.Price <= productParams.maxPrice);
+            }
+            else if (productParams.minPrice != null)
+            {
+                query = query.Where(m => m.Price >= productParams.minPrice);
+            }
+            else if (productParams.maxPrice != null)
+            {
+                query = query.Where(m => m.Price <= productParams.maxPrice);
+            }
+
 
 
             if (!string.IsNullOrEmpty(productParams.sort))
@@ -93,6 +119,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
                 {
                     "PriceAsc" => query.OrderBy(m => m.Price),
                     "PriceDesc" => query.OrderByDescending(m => m.Price),
+                    "Rating" => query.OrderByDescending(m => m.Rating),
                     _ => query.OrderBy(m => m.Name),
                 };
             }

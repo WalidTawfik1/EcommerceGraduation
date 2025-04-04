@@ -1,4 +1,5 @@
 ﻿using EcommerceGraduation.Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -19,7 +20,8 @@ namespace EcommerceGraduation.API.Controllers
         /// Get all invoices for the authenticated user.
         /// </summary>
         /// <returns> A list of invoices for the authenticated user.</returns>
-        [HttpGet("GetAllInvoicesForUser")]
+        [Authorize]
+        [HttpGet("get-all-invoices-for-user")]
         public async Task<IActionResult> GetAllInvoicesForUserAsync()
         {
             var customerClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
@@ -43,7 +45,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="invoiceId">The ID of the invoice to retrieve.</param>
         /// <returns>The invoice with the specified ID.</returns>
-        [HttpGet("GetInvoiceById")]
+        [Authorize]
+        [HttpGet("get-invoice-by-id")]
         public async Task<IActionResult> GetInvoiceByIdAsync(int invoiceId)
         {
             var customerClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);

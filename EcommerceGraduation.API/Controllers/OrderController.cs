@@ -1,5 +1,6 @@
 ﻿using EcommerceGraduation.Core.DTO;
 using EcommerceGraduation.Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -24,7 +25,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="orderDTO">The order details.</param>
         /// <returns>The created order.</returns>
-        [HttpPost("Create")]
+        [Authorize]
+        [HttpPost("create-order")]
         public async Task<IActionResult> CreateOrderAsync([FromBody] OrderDTO orderDTO)
         {
             var customerClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
@@ -48,7 +50,8 @@ namespace EcommerceGraduation.API.Controllers
         /// Gets all orders for the authenticated user.
         /// </summary>
         /// <returns>A list of orders for the user.</returns>
-        [HttpGet("GetAllOrdersForUser")]
+        [Authorize]
+        [HttpGet("get-all-orders-for-user")]
         public async Task<IActionResult> GetAllOrdersForUserAsync()
         {
             var customerClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
@@ -73,7 +76,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="orderNumber">The order number.</param>
         /// <returns>The order with the specified number.</returns>
-        [HttpGet("GetOrderById")]
+        [Authorize]
+        [HttpGet("get-order-by-id")]
         public async Task<IActionResult> GetOrderByIdAsync(string orderNumber)
         {
             var customerClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);

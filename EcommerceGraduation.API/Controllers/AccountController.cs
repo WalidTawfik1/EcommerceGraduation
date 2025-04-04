@@ -6,6 +6,7 @@ using EcommerceGraduation.Core.Interfaces;
 using EcommerceGraduation.Core.Services;
 using EcommerceGraduation.Infrastructure.Data;
 using EcommerceGraduation.Infrastrucutre.Repositores;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +38,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="registerDTO">The registration details.</param>
         /// <returns>A response indicating the result of the registration.</returns>
-        [HttpPost("Register")]
+        [AllowAnonymous]
+        [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDTO registerDTO)
         {
             var result = await work.Authentication.RegisterAsync(registerDTO);
@@ -53,7 +55,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="loginDTO">The login details.</param>
         /// <returns>A response indicating the result of the login.</returns>
-        [HttpPost("Login")]
+        [AllowAnonymous]
+        [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
             var result = await work.Authentication.LoginAsync(loginDTO);
@@ -77,7 +80,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="activeAccountDTO">The activation details.</param>
         /// <returns>A response indicating the result of the activation.</returns>
-        [HttpPost("ActiveAccount")]
+        [AllowAnonymous]
+        [HttpPost("active-account")]
         public async Task<IActionResult> ActiveAccount(ActiveAccountDTO activeAccountDTO)
         {
             var result = await work.Authentication.ActiveAccount(activeAccountDTO);
@@ -89,7 +93,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="email">The email address.</param>
         /// <returns>A response indicating the result of the email sending.</returns>
-        [HttpGet("SendEmailForgetPassword")]
+        [AllowAnonymous]
+        [HttpGet("send-email-forget-password")]
         public async Task<IActionResult> SendEmailForgetPassword(string email)
         {
             var result = await work.Authentication.SendEmailForgetPassword(email);
@@ -101,7 +106,8 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="resetPasswordDTO">The password reset details.</param>
         /// <returns>A response indicating the result of the password reset.</returns>
-        [HttpPost("ResetPassword")]
+        [AllowAnonymous]
+        [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordDTO resetPasswordDTO)
         {
             var result = await work.Authentication.ResetPassword(resetPasswordDTO);
@@ -115,7 +121,8 @@ namespace EcommerceGraduation.API.Controllers
         /// Logs out a user.
         /// </summary>
         /// <returns></returns>
-        [HttpGet("Logout")]
+        [Authorize]
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             Response.Cookies.Delete("token");
@@ -125,7 +132,8 @@ namespace EcommerceGraduation.API.Controllers
         /// Gets the profile of the authenticated user.
         /// </summary>
         /// <returns>User profile</returns>
-        [HttpGet("Profile")]
+        [Authorize]
+        [HttpGet("profile")]
         public async Task<IActionResult> GetProfile()
         {
             try
@@ -155,7 +163,8 @@ namespace EcommerceGraduation.API.Controllers
         /// Deletes the account of the authenticated user.
         /// </summary>
         /// <returns></returns>
-        [HttpDelete("DeleteAccount")]
+        [Authorize]
+        [HttpDelete("delete-account")]
         public async Task<IActionResult> DeleteAccount()
         {
             try
@@ -184,8 +193,9 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="customerDTO"></param>
         /// <returns></returns>
-        [HttpPut("UpdateProfile")]
-        public async Task<IActionResult> UpdateProfile([FromBody] CustomerDTO customerDTO)
+        [Authorize]
+        [HttpPut("edit-profile")]
+        public async Task<IActionResult> EditProfile([FromBody] CustomerDTO customerDTO)
         {
             try
             {
@@ -211,6 +221,7 @@ namespace EcommerceGraduation.API.Controllers
         /// Initiates Google login, Redirect automaticlly to google-response.
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("google-login")]
         public IActionResult GoogleLogin()
         
@@ -223,6 +234,7 @@ namespace EcommerceGraduation.API.Controllers
         /// Handles the Google login response.
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("google-response")]
         public async Task<IActionResult> GoogleResponse()
         {
