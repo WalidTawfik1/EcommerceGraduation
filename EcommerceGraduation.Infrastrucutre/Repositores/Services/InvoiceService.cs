@@ -59,7 +59,8 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
 
         public async Task<IReadOnlyList<InvoiceDTO>> GetAllInvoicesForUserAsync(string CustomerCode)
         {
-            var invoices = await _context.Invoices.Where(i => i.CustomerCode == CustomerCode).ToListAsync();
+            var invoices = await _context.Invoices.Where(i => i.CustomerCode == CustomerCode)
+                .Include(i => i.OrderNumberNavigation.OrderDetails).ToListAsync();
             var result = _mapper.Map<IReadOnlyList<InvoiceDTO>>(invoices);
             return result;
         }

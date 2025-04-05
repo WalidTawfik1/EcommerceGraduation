@@ -12,6 +12,8 @@ namespace EcommerceGraduation.API.Mapping
                 .ForMember(dest => dest.SubCategoryName, opt => opt.MapFrom(src => src.SubCategoryCodeNavigation.Name))
                 .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.BrandCodeNavigation.BrandName))
                 .ForMember(dest => dest.Photos, opt => opt.MapFrom(src => src.ProductImages))
+                .ForMember(dest => dest.ReviewCount, opt => opt.MapFrom(src => src.ProductReviews.Count))
+                .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src => src.ProductReviews))
                 .ReverseMap();
             CreateMap<ProductImage, PhotoDTO>().ReverseMap();
             CreateMap<Product, AddProductDTO>()
@@ -20,6 +22,12 @@ namespace EcommerceGraduation.API.Mapping
             CreateMap<Product, UpdateProductDTO>()
                  .ForMember(p => p.Photo, memberOptions: opt => opt.Ignore()).ReverseMap()
                  .ForMember(p => p.Barcode, opt => opt.Ignore());
+            CreateMap<ProductReview, ReviewDTO>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CustomerCodeNavigation.Name))
+                .ReverseMap();
+
+
+
 
         }
     }

@@ -6,6 +6,7 @@ using EcommerceGraduation.Core.Sharing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceGraduation.API.Controllers
 {
@@ -51,7 +52,12 @@ namespace EcommerceGraduation.API.Controllers
             try
             {
                 var product = await work.ProductRepository
-                    .GetByIdAsync(id, x => x.CategoryCodeNavigation, x => x.ProductImages, x => x.SubCategoryCodeNavigation, x => x.BrandCodeNavigation);
+                    .GetByIdAsync(id,
+                    x => x.CategoryCodeNavigation,
+                    x => x.ProductImages,
+                    x => x.SubCategoryCodeNavigation,
+                    x => x.BrandCodeNavigation,
+                    x => x.ProductReviews);
                 var result = mapper.Map<ProductDTO>(product);
                 if (product == null)
                 {

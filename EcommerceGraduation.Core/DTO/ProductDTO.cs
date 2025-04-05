@@ -29,6 +29,19 @@ namespace EcommerceGraduation.Core.DTO
       public int StockQuantity { get; set; }
     
       public double Rating { get; set; }
+
+      public int ReviewCount { get; set; }
+
+      public virtual List<ReviewDTO>? Reviews { get; set; }
+      
+    }
+
+    public record ReviewDTO
+    {
+        public string Name { get; set; }
+        public string ReviewText { get; set; }
+        public int Rating { get; set; }
+        public DateTime ReviewDate { get; set; }
     }
 
     public record PhotoDTO

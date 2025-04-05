@@ -64,6 +64,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
                          .Include(m => m.SubCategoryCodeNavigation)
                          .Include(m => m.BrandCodeNavigation)
                          .Include(m => m.ProductImages)
+                         .Include(m => m.ProductReviews).ThenInclude(m => m.CustomerCodeNavigation)
                          .AsNoTracking();
 
             //filter by search

@@ -8,7 +8,10 @@ namespace EcommerceGraduation.API.Mapping
     {
         public InvoiceMapping()
         {
-            CreateMap<Invoice, InvoiceDTO>().ReverseMap();
+            CreateMap<Invoice, InvoiceDTO>()
+                .ForMember(i => i.InvoiceDetails, opt => opt.MapFrom(src => src.OrderNumberNavigation.OrderDetails))
+                .ReverseMap();
+            CreateMap<OrderDetail, InvoiceDetailDTO>().ReverseMap();
         }
     }
 }

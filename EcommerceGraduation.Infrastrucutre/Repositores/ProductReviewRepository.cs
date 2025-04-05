@@ -131,5 +131,10 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<int> CountReviewsForProductAsync(int productId)
+        {
+            return await _context.ProductReviews.CountAsync(m => m.ProductId == productId);
+        }
     }
 }
