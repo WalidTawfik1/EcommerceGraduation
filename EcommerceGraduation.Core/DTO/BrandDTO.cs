@@ -9,20 +9,20 @@ using System.Threading.Tasks;
 namespace EcommerceGraduation.Core.DTO
 {
     public record BrandDTO
-     (string BrandCode, string Name);
+     (string BrandCode, string BrandName);
 
         public record AddBrandDTO
         {
             [JsonIgnore]
             public string BrandCode { get; set; } = GenerateCode.GetCode();
-            public string Name { get; init; }
-            public AddBrandDTO(string name)
+            public string BrandName { get; init; }
+            public AddBrandDTO(string BrandName)
             {
-                Name = name;
+            this.BrandName = BrandName;
                 BrandCode = GenerateCode.GetCode();
             }
         }
         public record UpdateBrandDTO
-             (string BrandCode, string Name);
+             (string BrandCode, string BrandName);
     
 }

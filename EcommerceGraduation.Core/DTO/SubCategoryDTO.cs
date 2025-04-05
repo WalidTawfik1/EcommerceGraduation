@@ -17,9 +17,9 @@ namespace EcommerceGraduation.Core.DTO
         public string SubCategoryCode { get; set; } = GenerateCode.GetCode();
         public string Name { get; init; }
         public string CategoryCode { get; set; }
-        public AddSubCategoryDTO(string name, string categoryCode)
+        public AddSubCategoryDTO(string Name, string categoryCode)
         {
-            Name = name;
+            this.Name = Name;
             SubCategoryCode = GenerateCode.GetCode();
             CategoryCode = categoryCode;
         }
