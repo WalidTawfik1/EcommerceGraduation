@@ -6,9 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
@@ -31,29 +30,52 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
                     var dbContext = scope.ServiceProvider.GetRequiredService<EcommerceDbContext>();
                     var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
 
-                    DateOnly today = DateOnly.FromDateTime(DateTime.Now);
-                    var UpdateShippingStatus = await dbContext.Shippings
-                        .Where(o => o.ShippingStatus == Status.Pending && o.EstimatedDeliveryDate.Value == today)
-                        .Include(o => o.OrderNumberNavigation)
-                        .ToListAsync();
-
-                    if (UpdateShippingStatus.Any())
+                    try
                     {
-                        foreach (var shipping in UpdateShippingStatus)
+                        DateOnly today = DateOnly.FromDateTime(DateTime.Now);
+
+                        var updateShippingStatus = await dbContext.Shippings
+                            .Where(o => o.ShippingStatus == Status.Pending && o.EstimatedDeliveryDate.Value == today)
+                            .Include(o => o.OrderNumberNavigation)
+                                .ThenInclude(o => o.CustomerCodeNavigation)
+                            .ToListAsync(stoppingToken);
+
+                        if (updateShippingStatus.Any())
                         {
-                            shipping.ShippingStatus = Status.Shipped;
-                            shipping.OrderNumberNavigation.OrderStatus = Status.Delivered;
-                            var userEmail = shipping.OrderNumberNavigation.CustomerCodeNavigation.Email;
-                            var emailContent = $"Your order {shipping.OrderNumber} has been delivered.";
-                            var emailDTO = new EmailDTO(
-                                userEmail,
-                                "maximlev643@gmail.com",
-                                "Order Delivered",
-                                emailContent
-                            );
-                            await emailService.SendEmailAsync(emailDTO);
+                            foreach (var shipping in updateShippingStatus)
+                            {
+                                if (shipping.OrderNumberNavigation == null ||
+                                    shipping.OrderNumberNavigation.CustomerCodeNavigation == null)
+                                {
+                                    // Optional debug logging
+                                    Console.WriteLine($"[Warning] Missing order or customer info for ShippingID: {shipping.ShippingId}");
+                                    continue;
+                                }
+
+                                shipping.ShippingStatus = Status.Shipped;
+                                shipping.OrderNumberNavigation.OrderStatus = Status.Delivered;
+
+                                var userEmail = shipping.OrderNumberNavigation.CustomerCodeNavigation.Email;
+                                if (!string.IsNullOrEmpty(userEmail))
+                                {
+                                    var emailContent = $"Your order {shipping.OrderNumber} has been delivered.";
+                                    var emailDTO = new EmailDTO(
+                                        userEmail,
+                                        "maximlev643@gmail.com",
+                                        "Order Delivered",
+                                        emailContent
+                                    );
+                                    await emailService.SendEmailAsync(emailDTO);
+                                }
+                            }
+
+                            await dbContext.SaveChangesAsync(stoppingToken);
                         }
-                        await dbContext.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log exception details to the console or a logger (optional)
+                        Console.WriteLine($"[Error] StatusUpdater failed: {ex.Message}");
                     }
                 }
 
@@ -61,5 +83,4 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             }
         }
     }
-
 }
