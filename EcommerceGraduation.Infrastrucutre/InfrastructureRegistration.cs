@@ -36,8 +36,7 @@ namespace EcommerceGraduation.Infrastrucutre
             // Register the IImageManagmentService service
             services.AddSingleton<IProductImageManagmentService, ProductImageManagementService>();
             // Register the IFileProvider service
-            services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
-
+            services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory())));
             // Register the IEmailService service
             services.AddScoped<IEmailService, EmailService>();
 

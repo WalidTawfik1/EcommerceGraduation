@@ -65,15 +65,15 @@ namespace EcommerceGraduation.API
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
+            //if (app.Environment.IsDevelopment())
+            //{
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "EcommerceGraduation.API v1");
                     c.RoutePrefix = string.Empty;
                 });
-            }
+            //}
             app.UseCors("CORSPolicy");
 
             app.UseMiddleware<ExceptionsMiddleware>();
