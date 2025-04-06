@@ -111,7 +111,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
 
                             var emailDTO = new EmailDTO(
                                 userEmail,
-                                "maximlev643@gmail.com",
+                                "smarket.ebusiness@gmail.com",
                                 "Order Delivered",
                                 emailContent
                             );

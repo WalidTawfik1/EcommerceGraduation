@@ -22,7 +22,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
         public async Task SendEmailAsync(EmailDTO emailDTO)
         {
             MimeMessage message = new MimeMessage();
-            message.From.Add(new MailboxAddress("EcommerceGraduation" ,configuration["EmailSettings:From"]));
+            message.From.Add(new MailboxAddress("SMarket" ,configuration["EmailSettings:From"]));
             message.Subject = emailDTO.Subject;
             message.To.Add(new MailboxAddress(emailDTO.To,emailDTO.To));
             message.Body = new TextPart(MimeKit.Text.TextFormat.Html)
