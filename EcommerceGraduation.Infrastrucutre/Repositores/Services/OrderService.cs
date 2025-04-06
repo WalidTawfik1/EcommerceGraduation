@@ -175,7 +175,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             </table>
 
             <p>If you have any questions or need further assistance, feel free to contact our support team.</p>
-            <p>Best regards,<br/>The E-Commerce Team</p>
+            <p>Best regards,<br/>The SMarket Team</p>
         </body>
     </html>";
 

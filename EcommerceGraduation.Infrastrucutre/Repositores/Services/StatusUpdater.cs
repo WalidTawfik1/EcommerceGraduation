@@ -105,7 +105,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             <p>We hope you’re enjoying your purchase! If you have any questions or feedback, we’d love to hear from you.</p>
 
             <p>Thank you for shopping with us!</p>
-            <p>Best regards,<br/>The E-Commerce Team</p>
+            <p>Best regards,<br/>The SMarket Team</p>
         </body>
     </html>";
 
