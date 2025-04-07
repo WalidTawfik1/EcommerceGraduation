@@ -45,12 +45,12 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             if(ratings.Count > 0)
             {
                 double? average = ratings.Average(m => m.Rating);
-                double roundedReview = Math.Round((double)(average * 2), mode: MidpointRounding.AwayFromZero) / 2;
-                product.Rating = roundedReview;
+                double roundedReview = Math.Round((double)average, 1);
+                product.Rating = (double)roundedReview;
             }
             else
             {
-                product.Rating = reviewDTO.Rating;
+                product.Rating = (double)reviewDTO.Rating;
             }
             await _context.SaveChangesAsync();
             return true;
@@ -76,7 +76,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             if (ratings.Count > 0)
             {
                 double? average = ratings.Average(m => m.Rating);
-                double roundedReview = Math.Round((double)(average * 2), MidpointRounding.AwayFromZero) / 2;
+                double roundedReview = Math.Round((double)average, 1);
                 product.Rating = roundedReview;
             }
             else
@@ -125,8 +125,8 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             var ratings = await _context.ProductReviews.AsNoTracking().Where(m => m.ProductId == product.ProductId).ToListAsync();
 
             product.Rating = ratings.Any()
-                ? Math.Round((double)(ratings.Average(m => m.Rating) * 2), MidpointRounding.AwayFromZero) / 2
-                : updateReviewDTO.Rating;
+                 ? Math.Round((double)ratings.Average(m => m.Rating), 1)
+                : Math.Round((double)updateReviewDTO.Rating, 1);
 
             await _context.SaveChangesAsync();
             return true;
