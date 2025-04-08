@@ -15,6 +15,7 @@ namespace EcommerceGraduation.Core.DTO
 
     public class ReturnProductReviewDTO
     {
+        public int ReviewId { get; set; }
         public int Rating { get; set; }
         public string? ReviewText { get; set; }
         public DateTime ReviewDate { get; set; }

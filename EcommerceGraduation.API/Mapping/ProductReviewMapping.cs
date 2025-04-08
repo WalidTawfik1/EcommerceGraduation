@@ -11,6 +11,7 @@ namespace EcommerceGraduation.API.Mapping
             CreateMap<ProductReview,ProductReviewDTO>().ReverseMap();
             CreateMap<ProductReview, ReturnProductReviewDTO>()
                 .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.CustomerCodeNavigation.Name))
+                .ForMember(dest => dest.ReviewId, opt => opt.MapFrom(src => src.ReviewId))
                 .ReverseMap();
             CreateMap<UpdateReviewDTO, ProductReview>().ReverseMap();
         }

@@ -12,6 +12,8 @@ namespace EcommerceGraduation.Core.DTO
  
   public record ProductDTO
   {
+      public int ProductID { get; set; }
+
       public string Name { get; set; }
 
       public string Description { get; set; }
@@ -28,7 +30,7 @@ namespace EcommerceGraduation.Core.DTO
 
       public int StockQuantity { get; set; }
     
-      public double Rating { get; set; }
+      public double? Rating { get; set; }
 
       public int ReviewCount { get; set; }
 

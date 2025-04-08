@@ -21,6 +21,7 @@ namespace EcommerceGraduation.Core.DTO
 
     public record ReturnOrderDetailDTO
     {
+        public int ProductID { get; set; }
         public string ProductName { get; set; }
         public string MainImage { get; set; }
         public int Quantity { get; set; }

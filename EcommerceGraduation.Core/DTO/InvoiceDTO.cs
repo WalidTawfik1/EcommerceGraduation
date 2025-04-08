@@ -8,6 +8,7 @@ namespace EcommerceGraduation.Core.DTO
 {
     public record InvoiceDTO
     {
+        public int InvoiceID { get; set; }
         public string OrderNumber { get; set; }
         public DateTime InvoiceDate { get; set; }
         public decimal TotalBeforeDiscount { get; set; }
@@ -20,6 +21,7 @@ namespace EcommerceGraduation.Core.DTO
     }
     public record InvoiceDetailDTO
     {
+        public int ProductID { get; set; }
         public string ProductName { get; set; }
         public decimal Price { get; set; }
         public int Quantity { get; set; }

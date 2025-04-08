@@ -94,6 +94,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
 
             return ratings.Select(m => new ReturnProductReviewDTO
             {
+                ReviewId = m.ReviewId,
                 CustomerName = m.CustomerCodeNavigation.Name,
                 Rating = (int)m.Rating,
                 ReviewText = m.ReviewText,
