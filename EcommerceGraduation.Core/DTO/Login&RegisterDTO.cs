@@ -28,13 +28,13 @@ namespace EcommerceGraduation.Core.DTO
 
     public record ResetPasswordDTO: LoginDTO
     {
-        public string Token { get; set; }
+        public string Code { get; set; }
     }
 
     public record ActiveAccountDTO
     {
         public string Email { get; set; }
-        public string Token { get; set; }
+        public string Code { get; set; }
     }
 
 }

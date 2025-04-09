@@ -17,6 +17,7 @@ namespace EcommerceGraduation.Core.Interfaces
         Task<bool> SendEmailForgetPassword(string email);
         Task<string> ResetPassword(ResetPasswordDTO resetPasswordDTO);
         Task<bool> ActiveAccount(ActiveAccountDTO activeAccountDTO);
-
+        Task StoreOtpForUser(string email, string otpCode, string purpose = "VerifyEmail");
+        Task SendEmailWithOtp(string email, string otpCode, string message);
     }
 }

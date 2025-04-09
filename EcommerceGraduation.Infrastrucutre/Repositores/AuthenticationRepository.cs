@@ -3,6 +3,7 @@ using EcommerceGraduation.Core.Entities;
 using EcommerceGraduation.Core.Interfaces;
 using EcommerceGraduation.Core.Services;
 using EcommerceGraduation.Core.Sharing;
+using EcommerceGraduation.Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -23,14 +24,17 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
         private readonly IEmailService emailService;
         private readonly SignInManager<Customer> signInManager;
         private readonly IGenerateToken generateToken;
+        private readonly EcommerceDbContext context;
 
-        public AuthenticationRepository(UserManager<Customer> userManager, IEmailService emailService, SignInManager<Customer> signInManager, IGenerateToken generateToken)
+        public AuthenticationRepository(UserManager<Customer> userManager, IEmailService emailService, SignInManager<Customer> signInManager, IGenerateToken generateToken, EcommerceDbContext context)
         {
             this.userManager = userManager;
             this.emailService = emailService;
             this.signInManager = signInManager;
             this.generateToken = generateToken;
+            this.context = context;
         }
+
         public async Task<string> RegisterAsync(RegisterDTO registerDTO)
         {
             try
@@ -65,9 +69,15 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
                 }
                 await userManager.AddToRoleAsync(customer, "Customer");
 
-                // send email activiation
-                string token = await userManager.GenerateEmailConfirmationTokenAsync(customer);
-                await SendEmail(customer.Email, token, "Active", "Email Activation", "Please Active your email, click on button to active");
+                // Generate OTP code instead of token
+                string otpCode = GenerateCode.GenerateOtpCode(6);
+
+                // Store OTP in database
+                await StoreOtpForUser(customer.Email, otpCode);
+
+                // Send OTP email
+                await SendEmailWithOtp(customer.Email, otpCode, "Please verify your email by entering the code below in the app");
+
                 return "User Created Successfully";
             }
             catch (DbUpdateException dbEx)
@@ -83,15 +93,6 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             }
         }
 
-        public async Task SendEmail(string email, string code, string component, string subject, string message)
-        {
-            var result = new EmailDTO (email,
-                "maximlev643@gmail.com",
-                subject,
-                EmailStringBody.send(email,code, component, message));
-            await emailService.SendEmailAsync(result);
-        }
-
         public async Task<string> LoginAsync(LoginDTO loginDTO)
         {
             if (loginDTO == null)
@@ -99,21 +100,28 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
                 return null;
             }
             var customer = await userManager.FindByEmailAsync(loginDTO.Email);
-            
-            if(!customer.EmailConfirmed)
-            {
-                string token = await userManager.GenerateEmailConfirmationTokenAsync(customer);
-                await SendEmail(customer.Email, token, "Active", "Email Activation", "Please Active your email, click on button to active");
-                return "Please Active your email first, we have sent the acivation link to your email";
 
+            if (!customer.EmailConfirmed)
+            {
+                // Generate OTP code instead of token
+                string otpCode = GenerateCode.GenerateOtpCode(6);
+
+                // Store OTP in database
+                await StoreOtpForUser(customer.Email, otpCode);
+
+                // Send OTP email
+                await SendEmailWithOtp(customer.Email, otpCode, "Please verify your email by entering the code below in the app");
+
+                return "Please verify your email first. We have sent a verification code to your email";
             }
+
             var result = await signInManager.CheckPasswordSignInAsync(customer, loginDTO.Password, true);
             if (result.Succeeded)
             {
                 return generateToken.GetAndCreateToken(customer);
             }
             return "Invalid Email or Password";
-        }  
+        }
 
         public async Task<bool> SendEmailForgetPassword(string email)
         {
@@ -122,8 +130,16 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             {
                 return false;
             }
-            string token = await userManager.GeneratePasswordResetTokenAsync(customer);
-            await SendEmail(customer.Email, token, "ResetPassword", "Reset Password", "Please click on the button to reset your password");
+
+            // Generate OTP code instead of token
+            string otpCode = GenerateCode.GenerateOtpCode(6);
+
+            // Store OTP in database with purpose "ResetPassword"
+            await StoreOtpForUser(customer.Email, otpCode, "ResetPassword");
+
+            // Send OTP email
+            await SendEmailWithOtp(customer.Email, otpCode, "Please use the code below to reset your password");
+
             return true;
         }
 
@@ -134,7 +150,31 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             {
                 return "Invalid Email";
             }
-            var result = await userManager.ResetPasswordAsync(customer, resetPasswordDTO.Token, resetPasswordDTO.Password);
+
+            // Verify OTP code
+            var otpVerification = await context.OtpVerifications
+                .Where(o => o.Email == resetPasswordDTO.Email && o.OtpCode == resetPasswordDTO.Code && !o.IsUsed)
+                .OrderByDescending(o => o.ExpirationTime)
+                .FirstOrDefaultAsync();
+
+            if (otpVerification == null)
+            {
+                return "Invalid verification code";
+            }
+
+            if (otpVerification.ExpirationTime < DateTime.UtcNow)
+            {
+                return "Verification code has expired";
+            }
+
+            // Mark OTP as used
+            otpVerification.IsUsed = true;
+            await context.SaveChangesAsync();
+
+            // Generate token for password reset
+            string token = await userManager.GeneratePasswordResetTokenAsync(customer);
+            var result = await userManager.ResetPasswordAsync(customer, token, resetPasswordDTO.Password);
+
             if (result.Succeeded)
             {
                 return "Password Reset Successfully";
@@ -149,14 +189,66 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             {
                 return false;
             }
-            var result = await userManager.ConfirmEmailAsync(customer, activeAccountDTO.Token);
-            if (result.Succeeded)
+
+            // Verify OTP code
+            var otpVerification = await context.OtpVerifications
+                .Where(o => o.Email == activeAccountDTO.Email && o.OtpCode == activeAccountDTO.Code && !o.IsUsed)
+                .OrderByDescending(o => o.ExpirationTime)
+                .FirstOrDefaultAsync();
+
+            if (otpVerification == null)
             {
-                return true;
+                return false;
             }
-            var token = await userManager.GenerateEmailConfirmationTokenAsync(customer);
-            await SendEmail(customer.Email, token, "Active", "Email Activation", "Please Active your email, click on button to active");
-            return false;
+
+            if (otpVerification.ExpirationTime < DateTime.UtcNow)
+            {
+                // Generate new OTP if expired
+                string otpCode = GenerateCode.GenerateOtpCode(6);
+                await StoreOtpForUser(customer.Email, otpCode);
+                await SendEmailWithOtp(customer.Email, otpCode, "Please verify your email by entering the code below in the app");
+                return false;
+            }
+
+            // Mark OTP as used
+            otpVerification.IsUsed = true;
+            await context.SaveChangesAsync();
+
+            // Confirm email
+            string token = await userManager.GenerateEmailConfirmationTokenAsync(customer);
+            var result = await userManager.ConfirmEmailAsync(customer, token);
+
+            return result.Succeeded;
+        }
+
+        public async Task StoreOtpForUser(string email, string otpCode, string purpose = "VerifyEmail")
+        {
+            DateTime expirationTime = DateTime.UtcNow.AddMinutes(10);
+
+            var otpVerification = new OtpVerification
+            {
+                Email = email,
+                OtpCode = otpCode,
+                ExpirationTime = expirationTime,
+                IsUsed = false,
+                Purpose = purpose
+            };
+
+            context.OtpVerifications.Add(otpVerification);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task SendEmailWithOtp(string email, string otpCode, string message)
+        {
+            EmailDTO emailDTO = new EmailDTO
+                (
+                to: email,
+                from: "smarket.ebusiness@gmail.com",
+                subject: "Email Verification",
+                content: EmailStringBody.send(email, otpCode, message)
+                );
+
+            await emailService.SendEmailAsync(emailDTO);
         }
     }
 }

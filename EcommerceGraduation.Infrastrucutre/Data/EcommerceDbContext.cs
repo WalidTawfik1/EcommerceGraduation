@@ -42,6 +42,7 @@ public partial class EcommerceDbContext : IdentityDbContext<Customer, IdentityRo
     public virtual DbSet<ProductReview> ProductReviews { get; set; }
     public virtual DbSet<Shipping> Shippings { get; set; }
     public virtual DbSet<SubCategory> SubCategories { get; set; }
+    public virtual DbSet<OtpVerification> OtpVerifications { get; set; }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
