@@ -158,9 +158,9 @@ namespace EcommerceGraduation.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        /*
+        
         /// <summary>
-        /// Deletes the account of the authenticated user.
+        /// Deletes the account of the authenticated user unless he didn't make an order.
         /// </summary>
         /// <returns></returns>
         [Authorize]
@@ -176,18 +176,14 @@ namespace EcommerceGraduation.API.Controllers
                 }
 
                 var result = await work.CustomerRepository.DeleteCustomerAsync(customerId);
-                if (!result)
-                {
-                    return NotFound($"Customer with ID {customerId} not found.");
-                }
 
-                return Ok(new APIResponse(200, "Account deleted successfully"));
+                return Ok(new APIResponse(200, result));
             }
             catch (System.Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-        }*/
+        }
         /// <summary>
         /// Updates the profile of the authenticated user.
         /// </summary>

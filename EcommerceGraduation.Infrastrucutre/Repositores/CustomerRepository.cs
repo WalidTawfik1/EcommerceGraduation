@@ -29,18 +29,26 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
 
 
 
-        public async Task<bool> DeleteCustomerAsync(string Id)
+        public async Task<string> DeleteCustomerAsync(string Id)
         {
             try
             {
                 var customer = await _context.Customers.FindAsync(Id);
                 if (customer == null)
                 {
-                    return false;
+                    return "This account was not found.";
                 }
+
+                var hasOrders = await _context.Orders.AnyAsync(o => o.CustomerCode == Id);
+                if (hasOrders)
+                {
+                    return "You can't delete your account since you made an order.";
+                }
+
                 _context.Customers.Remove(customer);
                 await _context.SaveChangesAsync();
-                return true;
+                return "Account deleted successfully.";
+
             }
             catch (DbUpdateException ex)
             {

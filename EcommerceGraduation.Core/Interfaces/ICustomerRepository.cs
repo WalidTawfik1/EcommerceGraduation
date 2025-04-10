@@ -11,7 +11,7 @@ namespace EcommerceGraduation.Core.Interfaces
     public interface ICustomerRepository
     {
         Task<CustomerDTO> GetCustomerByIdAsync(string Id);
-        Task<bool> DeleteCustomerAsync(string Id);
+        Task<string> DeleteCustomerAsync(string Id);
         Task<CustomerDTO> UpdateCustomerAsync(string Id, CustomerDTO customerDTO);
     }
 }
