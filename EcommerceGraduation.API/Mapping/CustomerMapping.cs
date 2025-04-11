@@ -9,6 +9,7 @@ namespace EcommerceGraduation.API.Mapping
         public CustomerMapping()
         {
             CreateMap<Customer, CustomerDTO>().ReverseMap();
+            CreateMap<Customer, UpdateCustomerDTO>().ReverseMap();
         }
     }
 }

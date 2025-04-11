@@ -191,7 +191,7 @@ namespace EcommerceGraduation.API.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPut("edit-profile")]
-        public async Task<IActionResult> EditProfile([FromBody] CustomerDTO customerDTO)
+        public async Task<IActionResult> EditProfile([FromBody] UpdateCustomerDTO customerDTO)
         {
             try
             {
@@ -286,6 +286,43 @@ namespace EcommerceGraduation.API.Controllers
             var token = _generateToken.GetAndCreateToken(user);
             return Ok(new { Token = token });
         }
+
+        /// <summary>
+        /// Verifies the OTP code sent to the user's email.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("verify-otp")]
+        public async Task<IActionResult> VerifyOtp([FromBody] OTPVerify request)
+        {
+            bool isValid = await work.Authentication.CheckOtpCode(request.Email, request.Code);
+
+            if (isValid)
+            {
+                return Ok(new { success = true, message = "Verification code is valid" });
+            }
+
+            return BadRequest(new { success = false, message = "Invalid or expired verification code" });
+        }
+
+        /// <summary>
+        /// Resends the OTP code to the user's email.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("resend-otp")]
+        public async Task<IActionResult> ResendOtp([FromBody] OTPResend request)
+        {
+            bool result = await work.Authentication.ResendOtpCode(request.Email);
+
+            if (result)
+            {
+                return Ok(new { success = true, message = "Verification code sent successfully" });
+            }
+
+            return BadRequest(new { success = false, message = "Failed to send verification code" });
+        }
+
 
     }
 }

@@ -68,7 +68,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             return _mapper.Map<CustomerDTO>(customer);
         }
 
-        public async Task<CustomerDTO> UpdateCustomerAsync(string customerId, CustomerDTO customerDTO)
+        public async Task<CustomerDTO> UpdateCustomerAsync(string customerId, UpdateCustomerDTO customerDTO)
         {
             if (string.IsNullOrEmpty(customerId))
             {

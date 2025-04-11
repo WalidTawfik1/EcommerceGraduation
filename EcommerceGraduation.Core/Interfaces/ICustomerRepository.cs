@@ -12,6 +12,6 @@ namespace EcommerceGraduation.Core.Interfaces
     {
         Task<CustomerDTO> GetCustomerByIdAsync(string Id);
         Task<string> DeleteCustomerAsync(string Id);
-        Task<CustomerDTO> UpdateCustomerAsync(string Id, CustomerDTO customerDTO);
+        Task<CustomerDTO> UpdateCustomerAsync(string Id, UpdateCustomerDTO customerDTO);
     }
 }

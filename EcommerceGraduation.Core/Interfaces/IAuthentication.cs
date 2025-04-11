@@ -19,5 +19,7 @@ namespace EcommerceGraduation.Core.Interfaces
         Task<bool> ActiveAccount(ActiveAccountDTO activeAccountDTO);
         Task StoreOtpForUser(string email, string otpCode, string purpose = "VerifyEmail");
         Task SendEmailWithOtp(string email, string otpCode, string message);
+        Task<bool> CheckOtpCode(string email, string otpCode);
+        Task<bool> ResendOtpCode(string email);
     }
 }
