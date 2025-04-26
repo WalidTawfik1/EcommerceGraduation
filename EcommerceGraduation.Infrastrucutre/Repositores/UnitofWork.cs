@@ -41,6 +41,8 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
 
         public ICustomerRepository CustomerRepository { get; }
 
+        public IWishlistRepository WishlistRepository { get; }
+
         public UnitofWork(EcommerceDbContext context, IProductImageManagmentService imageManagmentService, IMapper mapper,
             IConnectionMultiplexer redis, UserManager<Customer> userManager, IEmailService emailService, SignInManager<Customer> signInManager, IGenerateToken generateToken)
         {
@@ -56,11 +58,12 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             CategoryRepository = new CategoryRepository(_context);
             ProductRepository = new ProductRepository(_context, _mapper, _imageManagmentService);
             ProductImageRepository = new ProductImageRepository(_context);
-            CartRepository = new CartRepository(_redis);
+            CartRepository = new CartRepository(_redis,ProductRepository);
             SubCategoryRepository = new SubCategoryRepository(_context);
             BrandRepository = new BrandRepositroy(_context);
             Authentication = new AuthenticationRepository(_userManager, _emailService, _signInManager, _generateToken,context);
             CustomerRepository = new CustomerRepository(_context, _mapper);
+            WishlistRepository = new WishlistRepository(_redis, ProductRepository);
 
         }
     }

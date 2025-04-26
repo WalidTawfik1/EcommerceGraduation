@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
 {
@@ -142,7 +143,6 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             order.TotalAmount += shipping.ShippingCost;
             await _context.SaveChangesAsync();
 
-            await _unitofWork.CartRepository.DeleteCartAsync(orderDTO.CartId);
             await _invoiceService.GenerateInvoiceAsync(order.OrderNumber);
 
             var customerEmail = order.CustomerCodeNavigation.Email;
@@ -197,6 +197,28 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
                 .Include(o => o.OrderDetails)
                 .Include(o => o.Shippings)
                 .AsNoTracking();
+
+            //filter by search
+            if (!string.IsNullOrEmpty(page.search))
+            {
+                var searchword = page.search.Split(' ');
+                orders = orders.Where(m => searchword.All(
+                word => m.OrderNumber.ToLower().Contains(word.ToLower())
+                ));
+            }
+
+            // sort by OrderDate
+            if (!string.IsNullOrEmpty(page.sort))
+            {
+                orders = page.sort switch
+                {
+                    "OrderDateAsc" => orders.OrderBy(m => m.OrderDate),
+                    "OrderDateDesc" => orders.OrderByDescending(m => m.OrderDate),
+                    _ => orders.OrderBy(m => m.OrderDate),
+                };
+            }
+            if (page.sort == null) orders = orders.OrderBy(m => m.OrderDate);
+
             orders = orders.Skip((page.pagenum - 1) * page.pagesize).Take(page.pagesize);
 
             var result = _mapper.Map<IReadOnlyList<ReturnOrderDTO>>(orders);
@@ -216,6 +238,16 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             return result;
         }
 
+        public Task<IReadOnlyList<ReturnOrderDTO>> GetAllOrdersNoPaginate()
+        {
+            var orders = _context.Orders
+                .Include(o => o.OrderDetails)
+                .Include(o => o.Shippings)
+                .AsNoTracking();
+            var result = _mapper.Map<IReadOnlyList<ReturnOrderDTO>>(orders);
+            return Task.FromResult(result);
+        }
+
         public async Task<ReturnOrderDTO> GetOrderByIdAsync(string orderNumber, string CustomerCode)
         {
             var order = await _context.Orders.Where(o => o.OrderNumber == orderNumber && o.CustomerCode == CustomerCode)
@@ -228,6 +260,17 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             }
 
             var result = _mapper.Map<ReturnOrderDTO>(order);
+            return result;
+        }
+
+        public async Task<ReturnOrderStatusDTO> GetOrderStatusByIdAsync(string orderNumber)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderNumber == orderNumber);
+            if (order == null)
+            {
+                throw new InvalidOperationException("Order not found.");
+            }
+            var result = _mapper.Map<ReturnOrderStatusDTO>(order);
             return result;
         }
     }

@@ -9,8 +9,12 @@ namespace EcommerceGraduation.Core.Sharing
     public class PageSkip
     {
         public int pagenum { get; set; } = 1;
-        public int Maxpagesize { get; set; } = 6;
-        private int _pagesize = 3;
+        public int Maxpagesize { get; set; } = 50;
+        private int _pagesize;
+        public string? search { get; set; }
+        public string? sort { get; set; }
+
+
 
         public int pagesize
         {

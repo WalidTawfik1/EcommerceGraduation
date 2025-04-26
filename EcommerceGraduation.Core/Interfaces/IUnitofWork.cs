@@ -16,5 +16,6 @@ namespace EcommerceGraduation.Core.Interfaces
         IBrandRepository BrandRepository { get; }
         IAuthentication Authentication { get; }
         ICustomerRepository CustomerRepository { get; }
+        IWishlistRepository WishlistRepository { get; }
     }
 }

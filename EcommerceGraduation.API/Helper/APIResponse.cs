@@ -6,6 +6,14 @@
         {
             StatusCode = statusCode;
             Message = message ?? GetMessageFromStatusCode(StatusCode);
+            Data = null;
+        }
+
+        public APIResponse(int statusCode, string message, object data)
+        {
+            StatusCode = statusCode;
+            Message = message ?? GetMessageFromStatusCode(StatusCode);
+            Data = data;
         }
 
         private string GetMessageFromStatusCode(int statusCode)
@@ -25,5 +33,6 @@
         }
         public int StatusCode { get; set; }
         public string Message { get; set; }
+        public object Data { get; set; }
     }
 }

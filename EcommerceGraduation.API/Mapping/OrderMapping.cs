@@ -17,6 +17,7 @@ namespace EcommerceGraduation.API.Mapping
 
             CreateMap<OrderDetail, ReturnOrderDetailDTO>().ReverseMap();
             CreateMap<Shipping, ReturnOrderShippingDTO>().ReverseMap();
+            CreateMap<Order, ReturnOrderStatusDTO>().ReverseMap();
         }
     }
 

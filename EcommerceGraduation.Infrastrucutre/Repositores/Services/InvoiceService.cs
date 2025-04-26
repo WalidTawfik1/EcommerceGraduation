@@ -50,7 +50,30 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
 
         public async Task<IReadOnlyList<InvoiceDTO>> GetAllInvoices(PageSkip page)
         {
-            var invoices = _context.Invoices.AsNoTracking();
+            var invoices = _context.Invoices
+                .Include(i => i.OrderNumberNavigation.OrderDetails)
+                .AsNoTracking();
+
+            //filter by search
+            if (!string.IsNullOrEmpty(page.search))
+            {
+                var searchword = page.search.Split(' ');
+                invoices = invoices.Where(m => searchword.All(
+                word => m.InvoiceId.ToString().ToLower().Contains(word.ToLower())
+                ));
+            }
+
+            // sort by InvoiceDate
+            if (!string.IsNullOrEmpty(page.sort))
+            {
+                invoices = page.sort switch
+                {
+                    "InvoiceDateAsc" => invoices.OrderBy(m => m.InvoiceDate),
+                    "InvoiceDateDesc" => invoices.OrderByDescending(m => m.InvoiceDate),
+                    _ => invoices.OrderBy(m => m.InvoiceDate),
+                };
+            }
+
             invoices = invoices.Skip((page.pagenum - 1) * page.pagesize).Take(page.pagesize);
 
             var result = _mapper.Map<IReadOnlyList<InvoiceDTO>>(invoices);
@@ -63,6 +86,15 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
                 .Include(i => i.OrderNumberNavigation.OrderDetails).ToListAsync();
             var result = _mapper.Map<IReadOnlyList<InvoiceDTO>>(invoices);
             return result;
+        }
+
+        public Task<IReadOnlyList<InvoiceDTO>> GetAllInvoicesNoPaginate()
+        {
+            var invoices = _context.Invoices
+                .Include(i => i.OrderNumberNavigation.OrderDetails)
+                .AsNoTracking();
+            var result = _mapper.Map<IReadOnlyList<InvoiceDTO>>(invoices);
+            return Task.FromResult(result);
         }
 
         public async Task<InvoiceDTO> GetInvoiceByIdAsync(int invoiceId, string CustomerCode)

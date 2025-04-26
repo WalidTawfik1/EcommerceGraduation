@@ -15,5 +15,6 @@ namespace EcommerceGraduation.Core.Interfaces
         Task<bool> UpdateAsync(UpdateProductDTO productDTO);
         Task DeleteAsync(Product product);
         Task<IEnumerable<ProductDTO>> GetAllAsync(ProductParams productParams);
+        Task<IEnumerable<ProductDTO>> GetAllNoPaginateAsync(ProductParams2 productParams2);
     }
 }

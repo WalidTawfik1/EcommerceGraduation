@@ -6,21 +6,15 @@ using System.Threading.Tasks;
 
 namespace EcommerceGraduation.Core.Entities
 {
-    public class CartItem
+    public class Wishlist_Items
     {
         public int ProductId { get; set; }
         public String Name { get; set; }
-        public int Quantity { get; set; }
         public decimal Price { get; set; }
         public String Photo { get; set; }
-        public decimal TotalPrice => Price * Quantity;
-
     }
-
-    public class AddtoCart
+    public class AddtoWhishlist
     {
         public int ProductId { get; set; }
-        public int Quantity { get; set; }
-
     }
 }

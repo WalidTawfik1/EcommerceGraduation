@@ -17,6 +17,8 @@ public class Cart
         Id = id;
     }
     public string Id { get; set; }
+    public string PaymentToken { get; set; }
+    public string PaymentIntentId { get; set; }
     public List<CartItem> Items { get; set; } = new List<CartItem>();
     public decimal SubAmount => Items.Sum(item => item.TotalPrice);
 

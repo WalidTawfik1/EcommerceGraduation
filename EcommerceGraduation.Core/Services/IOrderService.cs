@@ -15,6 +15,9 @@ namespace EcommerceGraduation.Core.Services
         Task<IReadOnlyList<ReturnOrderDTO>> GetAllOrdersForUserAsync(string CustomerCode);
         Task<ReturnOrderDTO> GetOrderByIdAsync(string orderNumber,string CustomerCode);
         Task<IReadOnlyList<ReturnOrderDTO>> GetAllOrders(PageSkip page);
+        Task<IReadOnlyList<ReturnOrderDTO>> GetAllOrdersNoPaginate();
+        Task<ReturnOrderStatusDTO> GetOrderStatusByIdAsync(string orderNumber);
+
 
     }
 }

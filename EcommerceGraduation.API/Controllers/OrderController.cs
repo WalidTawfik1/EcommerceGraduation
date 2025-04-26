@@ -116,5 +116,47 @@ namespace EcommerceGraduation.API.Controllers
                 return StatusCode(500, new { message = ex.Message, innerException = ex.InnerException?.Message });
             }
         }
+
+        /// <summary>
+        /// Gets all orders for admin without pagination.
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(Roles = "Admin")]
+        [HttpGet("get-all-orders-no-paginate")]
+        public async Task<IActionResult> GetAllOrdersNoPaginate()
+        {
+            try
+            {
+                var orders = await _orderService.GetAllOrdersNoPaginate();
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message, innerException = ex.InnerException?.Message });
+            }
+        }
+
+        /// <summary>
+        /// Gets the status of an order by its number.
+        /// </summary>
+        /// <param name="orderNumber"></param>
+        /// <returns></returns>
+        [HttpGet("get-order-status-by-id")]
+        public async Task<IActionResult> GetOrderStatusByIdAsync(string orderNumber)
+        {
+            if (string.IsNullOrEmpty(orderNumber))
+            {
+                return BadRequest(new { message = "Order number is required" });
+            }
+            try
+            {
+                var orderStatus = await _orderService.GetOrderStatusByIdAsync(orderNumber);
+                return Ok(orderStatus);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message, innerException = ex.InnerException?.Message });
+            }
+        }
     }
 }

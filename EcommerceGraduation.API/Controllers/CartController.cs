@@ -31,15 +31,26 @@ namespace EcommerceGraduation.API.Controllers
         }
 
         /// <summary>
-        /// Updates a shopping cart.
+        /// Adds an item to a shopping cart.
         /// </summary>
-        /// <param name="basket">The cart details.</param>
-        /// <returns>The updated shopping cart.</returns>
+        /// <param name="cartId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [AllowAnonymous]
-        [HttpPost("update-cart")]
-        public async Task<ActionResult> UpdateBasket(Cart basket)
+        [HttpPost("add-to-cart")]
+        public async Task<ActionResult> AddToCart(string cartId, [FromBody] AddtoCart request)
         {
-            var result = await work.CartRepository.UpdateCartAsync(basket);
+            if (string.IsNullOrEmpty(cartId) || request == null)
+            {
+                return BadRequest(new APIResponse(400, "Invalid parameters"));
+            }
+
+            var result = await work.CartRepository.AddToCartAsync(cartId, request.ProductId, request.Quantity);
+            if (result == null)
+            {
+                return BadRequest(new APIResponse(400, "Failed to add item to cart"));
+            }
+
             return Ok(result);
         }
 
@@ -48,7 +59,7 @@ namespace EcommerceGraduation.API.Controllers
         /// </summary>
         /// <param name="id">The cart ID.</param>
         /// <returns>A response indicating the result of the deletion.</returns>
-        [Authorize(Roles = "Admin")]
+        [AllowAnonymous]
         [HttpDelete("delete-cart/{id}")]
         public async Task<ActionResult> DeleteBasket(string id)
         {
@@ -56,5 +67,56 @@ namespace EcommerceGraduation.API.Controllers
             return result ? Ok(new APIResponse(200, "Basket Deleted Successfully"))
                 : BadRequest(new APIResponse(400, "Failed to Delete Basket"));
         }
+
+        /// <summary>
+        /// Removes an item from a shopping cart.
+        /// </summary>
+        /// <param name="cartId">The cart ID.</param>
+        /// <param name="productId">The product ID to remove.</param>
+        /// <returns>The updated shopping cart.</returns>
+        [AllowAnonymous]
+        [HttpDelete("remove-item")]
+        public async Task<ActionResult> RemoveItemFromCart(string cartId, int productId)
+        {
+            if (string.IsNullOrEmpty(cartId) || productId <= 0)
+            {
+                return BadRequest(new APIResponse(400, "Invalid parameters"));
+            }
+
+            var result = await work.CartRepository.RemoveItemFromCartAsync(cartId, productId);
+            if (result == null)
+            {
+                return BadRequest(new APIResponse(400, "Failed to remove item from cart"));
+            }
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Updates the quantity of an item in a shopping cart.
+        /// </summary>
+        /// <param name="cartId">The cart ID.</param>
+        /// <param name="productId">The product ID to update.</param>
+        /// <param name="quantity">The new quantity.</param>
+        /// <returns>The updated shopping cart.</returns>
+        [AllowAnonymous]
+        [HttpPut("update-quantity")]
+        public async Task<ActionResult> UpdateItemQuantity(string cartId, int productId, int quantity)
+        {
+            if (string.IsNullOrEmpty(cartId) || productId <= 0 || quantity < 0)
+            {
+                return BadRequest(new APIResponse(400, "Invalid parameters"));
+            }
+
+            var result = await work.CartRepository.UpdateItemQuantityAsync(cartId, productId, quantity);
+            if (result == null)
+            {
+                return BadRequest(new APIResponse(400, "Failed to update item quantity"));
+            }
+
+            return Ok(result);
+        }
+
+
     }
 }

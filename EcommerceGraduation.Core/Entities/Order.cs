@@ -23,6 +23,9 @@ public partial class Order
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public Status PaymentStatus { get; set; } = Status.Pending;
 
+    [NotMapped]
+    public string PaymentToken { get; set; }
+
     [StringLength(20)]
     public string CustomerCode { get; set; } = null!;
 

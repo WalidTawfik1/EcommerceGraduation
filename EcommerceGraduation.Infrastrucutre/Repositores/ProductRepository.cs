@@ -132,6 +132,38 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             return result;
         }
 
+        public async Task<IEnumerable<ProductDTO>> GetAllNoPaginateAsync(ProductParams2 productParams2)
+        {
+            var query = context.Products
+                         .Include(m => m.CategoryCodeNavigation)
+                         .Include(m => m.SubCategoryCodeNavigation)
+                         .Include(m => m.BrandCodeNavigation)
+                         .Include(m => m.ProductImages)
+                         .Include(m => m.ProductReviews).ThenInclude(m => m.CustomerCodeNavigation)
+                         .AsNoTracking();
+
+            //filter by categoryId
+            if (!string.IsNullOrEmpty(productParams2.categoryCode))
+            {
+                query = query.Where(m => m.CategoryCode == productParams2.categoryCode);
+            }
+
+            //filter by subcategoryId
+            if (!string.IsNullOrEmpty(productParams2.subCategoryCode))
+            {
+                query = query.Where(m => m.SubCategoryCode == productParams2.subCategoryCode);
+            }
+
+            //filter by brandId
+            if (!string.IsNullOrEmpty(productParams2.brandCode))
+            {
+                query = query.Where(m => m.BrandCode == productParams2.brandCode);
+            }
+
+            var result = mapper.Map<List<ProductDTO>>(query);
+            return result;
+        }
+
         public async Task<bool> UpdateAsync(UpdateProductDTO productDTO)
         {
             if (productDTO == null) return false;

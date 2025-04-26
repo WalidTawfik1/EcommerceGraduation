@@ -23,6 +23,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using X.Paymob.CashIn;
 
 namespace EcommerceGraduation.Infrastrucutre
 {
@@ -54,6 +55,16 @@ namespace EcommerceGraduation.Infrastrucutre
 
             // Register the StatusUpdater service
             services.AddHostedService<StatusUpdater>();
+
+            // Register the Paymob service
+            services.AddPaymobCashIn(options =>
+            {
+                options.ApiKey = configuration["Paymob:ApiKey"];
+                options.Hmac = configuration["Paymob:HMAC"];
+            });
+
+            // Register the IPaymob service
+            services.AddScoped<IPaymobService, PaymobService>();
 
             // Register the AppDbContext with SQL Server
             services.AddDbContext<EcommerceDbContext>((options) =>

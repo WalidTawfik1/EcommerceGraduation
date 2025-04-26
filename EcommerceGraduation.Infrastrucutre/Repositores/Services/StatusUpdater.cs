@@ -65,7 +65,8 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
                                o.EstimatedDeliveryDate.HasValue &&
                                o.EstimatedDeliveryDate.Value == today &&
                                o.OrderNumber != null &&
-                               o.OrderNumberNavigation != null)
+                               o.OrderNumberNavigation != null &&
+                               o.OrderNumberNavigation.OrderStatus != Status.PaymentFailed)
                     .Include(o => o.OrderNumberNavigation)
                     .ThenInclude(o => o.CustomerCodeNavigation)
                     .ToListAsync(stoppingToken);
@@ -81,7 +82,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
                             continue;
                         }
 
-                        shipping.ShippingStatus = Status.Shipped;
+                        shipping.ShippingStatus = Status.Delivered;
                         shipping.OrderNumberNavigation.OrderStatus = Status.Delivered;
 
                         // Skip if CustomerCodeNavigation is null

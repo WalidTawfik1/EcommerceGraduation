@@ -64,7 +64,7 @@ namespace EcommerceGraduation.API.Middlewares
             });
             if (dateNow - timeStamp < rateLimitWindow)
             {
-                if (count >= 10)
+                if (count >= 20)
                 {
                     return false;
                 }
@@ -83,7 +83,8 @@ namespace EcommerceGraduation.API.Middlewares
             context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
             context.Response.Headers.Add("X-Frame-Options", "DENY");
             context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
-            context.Response.Headers.Add("Content-Security-Policy", "default-src 'self'");
+            context.Response.Headers.Add("Content-Security-Policy",
+                "default-src 'self'; style-src 'self' 'unsafe-inline'");
         }
 
     }

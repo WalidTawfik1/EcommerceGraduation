@@ -19,6 +19,14 @@ namespace EcommerceGraduation.Core.DTO
 
     }
 
+    public record ReturnOrderStatusDTO
+    {
+        public string OrderNumber { get; set; }
+        public string OrderDate { get; set; }
+        public string OrderStatus { get; set; }
+        public string PaymentStatus { get; set; }
+    }
+
     public record ReturnOrderDetailDTO
     {
         public int ProductID { get; set; }

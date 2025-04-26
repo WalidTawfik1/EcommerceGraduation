@@ -15,5 +15,8 @@ namespace EcommerceGraduation.Core.Services
         Task<IReadOnlyList<InvoiceDTO>> GetAllInvoicesForUserAsync(string CustomerCode);
         Task<InvoiceDTO> GetInvoiceByIdAsync(int invoiceId, string CustomerCode);
         Task<IReadOnlyList<InvoiceDTO>> GetAllInvoices(PageSkip page);
+        Task<IReadOnlyList<InvoiceDTO>> GetAllInvoicesNoPaginate();
+
+
     }
 }

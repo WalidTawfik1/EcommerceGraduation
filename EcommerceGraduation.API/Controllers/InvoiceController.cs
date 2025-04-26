@@ -85,6 +85,24 @@ namespace EcommerceGraduation.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Get all invoices for admin without pagination.
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(Roles = "Admin")]
+        [HttpGet("get-all-invoices-no-paginate")]
+        public async Task<IActionResult> GetAllInvoicesNoPaginate()
+        {
+            try
+            {
+                var invoices = await _invoiceService.GetAllInvoicesNoPaginate();
+                return Ok(invoices);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message, innerException = ex.InnerException?.Message });
+            }
 
+        }
     }
 }

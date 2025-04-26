@@ -6,6 +6,7 @@ using EcommerceGraduation.Core.Interfaces;
 using EcommerceGraduation.Core.Services;
 using EcommerceGraduation.Infrastructure.Data;
 using EcommerceGraduation.Infrastrucutre.Repositores;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -265,6 +266,8 @@ namespace EcommerceGraduation.API.Controllers
                     };
 
                     var result = await _userManager.CreateAsync(user);
+                    await _userManager.AddToRoleAsync(user, "Customer");
+
                     if (!result.Succeeded)
                     {
                         return BadRequest(new { Message = "User creation failed.", Errors = result.Errors });
@@ -284,7 +287,7 @@ namespace EcommerceGraduation.API.Controllers
 
             // Generate JWT token
             var token = _generateToken.GetAndCreateToken(user);
-            return Ok(new { Token = token });
+            return Redirect($"https://graduation-project-smarket.vercel.app/google-bridge?token={token}");
         }
 
         /// <summary>
@@ -321,6 +324,80 @@ namespace EcommerceGraduation.API.Controllers
             }
 
             return BadRequest(new { success = false, message = "Failed to send verification code" });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("mobile-google-login")]
+        public async Task<IActionResult> MobileGoogleLogin([FromBody] GoogleTokenDTO dto)
+        {
+            if (string.IsNullOrEmpty(dto.IdToken))
+                return BadRequest("Invalid ID token.");
+
+            GoogleJsonWebSignature.Payload payload;
+            try
+            {
+                var settings = new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = new List<string>
+                {
+                    _configuration["Authentication:Google:AndroidClientId"] // Validate it's from your mobile app
+                }
+                };
+
+                payload = await GoogleJsonWebSignature.ValidateAsync(dto.IdToken, settings);
+            }
+            catch (InvalidJwtException ex)
+            {
+                return BadRequest("Invalid Google token: " + ex.Message);
+            }
+
+
+            var user = await _userManager.FindByLoginAsync("Google", payload.Subject);
+            if (user == null)
+            {
+                user = await _userManager.FindByEmailAsync(payload.Email);
+                if (user == null)
+                {
+                    user = new Customer
+                    {
+                        UserName = payload.Email.Split('@')[0],
+                        Email = payload.Email,
+                        Name = payload.Name,
+                        EmailConfirmed = true,
+                        UserType = "Customer",
+                        CreatedAt = DateTime.Now
+                    };
+
+                    var result = await _userManager.CreateAsync(user);
+                    if (!result.Succeeded)
+                        return BadRequest(new { message = "User creation failed", errors = result.Errors });
+
+                    await _userManager.AddToRoleAsync(user, "Customer");
+                }
+
+                var loginInfo = new UserLoginInfo("Google", payload.Subject, "Google");
+                var loginResult = await _userManager.AddLoginAsync(user, loginInfo);
+                if (!loginResult.Succeeded)
+                    return BadRequest(new { message = "Google login association failed", errors = loginResult.Errors });
+            }
+
+            // Optionally sign the user in with cookie auth here (if used)
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            // Generate JWT
+            var token = _generateToken.GetAndCreateToken(user);
+
+            return Ok(new
+            {
+                Token = token,
+                User = new
+                {
+                    user.Id,
+                    user.Email,
+                    user.Name,
+                    user.UserType,
+                }
+            });
         }
 
 

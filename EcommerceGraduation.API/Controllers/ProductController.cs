@@ -72,13 +72,32 @@ namespace EcommerceGraduation.API.Controllers
         }
 
         /// <summary>
+        /// Gets all products without pagination.
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet("get-all-products-no-paginate")]
+        public async Task<IActionResult> GetAllNoPaginate([FromQuery] ProductParams2 productParams2)
+        {
+            try
+            {
+                var products = await work.ProductRepository.GetAllNoPaginateAsync(productParams2);
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Adds a new product.
         /// </summary>
         /// <param name="productDTO">The product details.</param>
         /// <returns>A response indicating the result of the addition.</returns>
         [Authorize(Roles = "Admin")]
         [HttpPost("add-product")]
-        public async Task<IActionResult> Add(AddProductDTO productDTO)
+        public async Task<IActionResult> Add([FromForm] AddProductDTO productDTO)
         {
             try
             {
@@ -98,7 +117,7 @@ namespace EcommerceGraduation.API.Controllers
         /// <returns>A response indicating the result of the update.</returns>
         [Authorize(Roles = "Admin")]
         [HttpPut("update-product")]
-        public async Task<IActionResult> Update(UpdateProductDTO productDTO)
+        public async Task<IActionResult> Update([FromForm] UpdateProductDTO productDTO)
         {
             try
             {
