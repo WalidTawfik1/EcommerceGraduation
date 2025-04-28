@@ -31,6 +31,9 @@ namespace EcommerceGraduation.Infrastrucutre
     {
         public static object InfrastructureConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
+            // Load environment variables from .env file
+            DotNetEnv.Env.Load();
+
             // Register the IUnitofWork service
             services.AddScoped<IUnitofWork, UnitofWork>();
 

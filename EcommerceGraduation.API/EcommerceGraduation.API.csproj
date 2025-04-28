@@ -13,6 +13,7 @@
 
 	<ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
+    <PackageReference Include="DotNetEnv" Version="3.1.1" />
     <PackageReference Include="Google.Apis.Auth" Version="1.69.0" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.14" />
@@ -43,5 +44,10 @@
     <Folder Include="wwwroot\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
+
+	<ItemGroup>
+		<None Include=".env" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
 
 </Project>
