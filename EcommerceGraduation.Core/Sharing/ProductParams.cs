@@ -20,6 +20,7 @@ namespace EcommerceGraduation.Core.Sharing
 
         public string? sort { get; set; }
         public string? categoryCode { get; set; }
+        public string? categoryCode2 { get; set; }
         public string? search { get; set; }
         public string? subCategoryCode { get; set; }
         public string? brandCode { get; set; }

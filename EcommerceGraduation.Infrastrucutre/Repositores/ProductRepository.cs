@@ -83,8 +83,19 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             //filter by categoryId
             if (!string.IsNullOrEmpty(productParams.categoryCode))
             {
-                query = query.Where(m => m.CategoryCode == productParams.categoryCode);
+                //filter by two categoryIds
+                if (!string.IsNullOrEmpty(productParams.categoryCode) && !string.IsNullOrEmpty(productParams.categoryCode2))
+                {
+                    query = query.Where(m => m.CategoryCode == productParams.categoryCode || m.CategoryCode == productParams.categoryCode2);
+                }
+                else
+                {
+                    query = query.Where(m => m.CategoryCode == productParams.categoryCode);
+                }
+
             }
+
+            
 
             //filter by subcategoryId
             if (!string.IsNullOrEmpty(productParams.subCategoryCode))
