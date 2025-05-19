@@ -70,12 +70,16 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             //filter by search
             if (!string.IsNullOrEmpty(productParams.search))
             {
-                var searchword = productParams.search.Split(' ');
-                query = query.Where(m => searchword.All(
-                word => m.Name.ToLower().Contains(word.ToLower())
-                || //or
-                m.Description.ToLower().Contains(word.ToLower())
-                ));
+                var searchwords = productParams.search.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (searchwords.Any())
+                {
+                    // Match ANY of the search words instead of ALL
+                    query = query.Where(m => searchwords.Any(
+                        word => m.Name.ToLower().Contains(word.ToLower())
+                        ||
+                        m.Description.ToLower().Contains(word.ToLower())
+                    ));
+                }
             }
 
 

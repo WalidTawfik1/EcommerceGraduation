@@ -340,7 +340,7 @@ namespace EcommerceGraduation.API.Controllers
                 {
                     Audience = new List<string>
                 {
-                    _configuration["Authentication:Google:AndroidClientId"] // Validate it's from your mobile app
+                    _configuration["Authentication:Google:ClientId"]
                 }
                 };
 
@@ -381,10 +381,8 @@ namespace EcommerceGraduation.API.Controllers
                     return BadRequest(new { message = "Google login association failed", errors = loginResult.Errors });
             }
 
-            // Optionally sign the user in with cookie auth here (if used)
             await _signInManager.SignInAsync(user, isPersistent: false);
 
-            // Generate JWT
             var token = _generateToken.GetAndCreateToken(user);
 
             return Ok(new
