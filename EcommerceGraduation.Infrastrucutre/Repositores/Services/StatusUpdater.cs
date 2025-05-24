@@ -33,7 +33,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
                 await UpdateStatuses(stoppingToken);
 
                 // Then schedule to run daily
-                using var timer = new PeriodicTimer(TimeSpan.FromHours(24));
+                using var timer = new PeriodicTimer(TimeSpan.FromHours(1));
 
                 while (await timer.WaitForNextTickAsync(stoppingToken))
                 {
@@ -66,7 +66,8 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
                                o.EstimatedDeliveryDate.Value == today &&
                                o.OrderNumber != null &&
                                o.OrderNumberNavigation != null &&
-                               o.OrderNumberNavigation.OrderStatus != Status.PaymentFailed)
+                               o.OrderNumberNavigation.OrderStatus == Status.Shipped &&
+                               o.OrderNumberNavigation.PaymentStatus == Status.Success)
                     .Include(o => o.OrderNumberNavigation)
                     .ThenInclude(o => o.CustomerCodeNavigation)
                     .ToListAsync(stoppingToken);
