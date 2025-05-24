@@ -1,4 +1,5 @@
-﻿using EcommerceGraduation.Core.Entities;
+﻿using EcommerceGraduation.Core.DTO;
+using EcommerceGraduation.Core.Entities;
 using EcommerceGraduation.Core.Interfaces;
 using EcommerceGraduation.Core.Services;
 using EcommerceGraduation.Infrastructure.Data;
@@ -23,17 +24,20 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
         private readonly IConfiguration _configuration;
         private readonly EcommerceDbContext _context;
         private readonly IPaymobCashInBroker _broker;
+        private readonly IEmailService _emailService;
 
         public PaymobService(
             EcommerceDbContext context,
             IConfiguration configuration,
             IUnitofWork unitofWork,
-            IPaymobCashInBroker broker)
+            IPaymobCashInBroker broker,
+            IEmailService emailService)
         {
             _context = context;
             _configuration = configuration;
             _unitofWork = unitofWork;
             _broker = broker;
+            _emailService = emailService;
         }
 
         public async Task<Cart> CreateOrUpdatePaymentAsync(string cartId)
@@ -210,6 +214,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             var order = await _context.Orders
                 .Include(o => o.OrderDetails)
                 .Include(o => o.Shippings)
+                .Include(o => o.CustomerCodeNavigation)
                 .FirstOrDefaultAsync(o => o.OrderNumber == payment.OrderNumber);
 
             var customerCode = order.CustomerCode;
@@ -239,6 +244,8 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             _context.Orders.Update(order);
             _context.Payments.Update(payment);
             await _context.SaveChangesAsync();
+
+            await SendOrderSuccessEmailAsync(order, shipping);
 
             return order;
         }
@@ -285,6 +292,66 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             await _context.SaveChangesAsync();
 
             return order;
+        }
+
+        private async Task SendOrderSuccessEmailAsync(Order order, Shipping shipping)
+        {
+            var customerEmail = order.CustomerCodeNavigation?.Email;
+            if (!string.IsNullOrEmpty(customerEmail))
+            {
+                var emailContent = $@"
+    <html>
+        <body style='font-family: Arial, sans-serif; color: #333;'>
+            <h2>Payment Successful!</h2>
+            <p>Dear {order.CustomerCodeNavigation.Name},</p>
+            <p>Great news! Your payment for order #{order.OrderNumber} has been successfully processed. We're preparing your items for shipping.</p>
+
+            <table style='border-collapse: collapse; width: 100%; max-width: 600px;'>
+                <tr>
+                    <td style='padding: 8px; font-weight: bold;'>Order Number:</td>
+                    <td style='padding: 8px;'>{order.OrderNumber}</td>
+                </tr>
+                <tr>
+                    <td style='padding: 8px; font-weight: bold;'>Order Date:</td>
+                    <td style='padding: 8px;'>{order.OrderDate:MMMM dd, yyyy}</td>
+                </tr>
+                <tr>
+                    <td style='padding: 8px; font-weight: bold;'>Payment Status:</td>
+                    <td style='padding: 8px; color: green;'>Successful</td>
+                </tr>
+                <tr>
+                    <td style='padding: 8px; font-weight: bold;'>Shipping Method:</td>
+                    <td style='padding: 8px;'>{shipping?.ShippingMethod}</td>
+                </tr>
+                <tr>
+                    <td style='padding: 8px; font-weight: bold;'>Estimated Delivery Date:</td>
+                    <td style='padding: 8px;'>{shipping?.EstimatedDeliveryDate:MMMM dd, yyyy}</td>
+                </tr>
+                <tr>
+                    <td style='padding: 8px; font-weight: bold;'>Tracking Number:</td>
+                    <td style='padding: 8px;'>{shipping?.TrackingNumber}</td>
+                </tr>
+                <tr>
+                    <td style='padding: 8px; font-weight: bold;'>Total Amount:</td>
+                    <td style='padding: 8px;'>{order.TotalAmount:F2}</td>
+                </tr>
+            </table>
+
+            <p>You'll receive another notification when your order ships. If you have any questions or need further assistance, feel free to contact our support team.</p>
+            <p>Thank you for shopping with us!</p>
+            <p>Best regards,<br/>The SMarket Team</p>
+        </body>
+    </html>";
+
+                var emailDTO = new EmailDTO(
+                    customerEmail,
+                    "smarket.ebusiness@gmail.com",
+                    "Payment Successful - Order #" + order.OrderNumber,
+                    emailContent
+                );
+
+                await _emailService.SendEmailAsync(emailDTO);
+            }
         }
 
         public async Task<Order> ProcessTransactionCallback(CashInCallbackTransaction callback)

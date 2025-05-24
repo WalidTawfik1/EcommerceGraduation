@@ -145,49 +145,6 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
 
             await _invoiceService.GenerateInvoiceAsync(order.OrderNumber);
 
-            var customerEmail = order.CustomerCodeNavigation.Email;
-            if (!string.IsNullOrEmpty(customerEmail))
-            {
-                var emailContent = $@"
-    <html>
-        <body style='font-family: Arial, sans-serif; color: #333;'>
-            <h2>Order Confirmation</h2>
-            <p>Dear Customer,</p>
-            <p>Thank you for your purchase! Your order has been successfully created. Below are the details:</p>
-
-            <table style='border-collapse: collapse; width: 100%; max-width: 600px;'>
-                <tr>
-                    <td style='padding: 8px; font-weight: bold;'>Order Number:</td>
-                    <td style='padding: 8px;'>{order.OrderNumber}</td>
-                </tr>
-                <tr>
-                    <td style='padding: 8px; font-weight: bold;'>Shipping Method:</td>
-                    <td style='padding: 8px;'>{shipping.ShippingMethod}</td>
-                </tr>
-                <tr>
-                    <td style='padding: 8px; font-weight: bold;'>Estimated Delivery Date:</td>
-                    <td style='padding: 8px;'>{shipping.EstimatedDeliveryDate:MMMM dd, yyyy}</td>
-                </tr>
-                <tr>
-                    <td style='padding: 8px; font-weight: bold;'>Total Amount:</td>
-                    <td style='padding: 8px;'>{order.TotalAmount:F2}</td>
-                </tr>
-            </table>
-
-            <p>If you have any questions or need further assistance, feel free to contact our support team.</p>
-            <p>Best regards,<br/>The SMarket Team</p>
-        </body>
-    </html>";
-
-                var emailDTO = new EmailDTO(
-                    customerEmail,
-                    "smarket.ebusiness@gmail.com",
-                    "Order Delivered",
-                    emailContent
-                );
-
-                await _emailService.SendEmailAsync(emailDTO);
-            }
             return order;
         }
 
