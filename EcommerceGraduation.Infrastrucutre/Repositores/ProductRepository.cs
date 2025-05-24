@@ -6,6 +6,7 @@ using EcommerceGraduation.Core.Services;
 using EcommerceGraduation.Core.Sharing;
 using EcommerceGraduation.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -175,6 +176,20 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
                 query = query.Where(m => m.BrandCode == productParams2.brandCode);
             }
 
+            var result = mapper.Map<List<ProductDTO>>(query);
+            return result;
+        }
+
+        public async Task<IEnumerable<ProductDTO>> GetAllRecommendedProducts(List<int> productIds)
+        {
+            var query = context.Products
+                         .Include(m => m.CategoryCodeNavigation)
+                         .Include(m => m.SubCategoryCodeNavigation)
+                         .Include(m => m.BrandCodeNavigation)
+                         .Include(m => m.ProductImages)
+                         .Include(m => m.ProductReviews).ThenInclude(m => m.CustomerCodeNavigation)
+                         .AsNoTracking()
+                         .Where(m => productIds.Contains(m.ProductId));
             var result = mapper.Map<List<ProductDTO>>(query);
             return result;
         }

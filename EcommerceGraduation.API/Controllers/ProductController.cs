@@ -151,5 +151,34 @@ namespace EcommerceGraduation.API.Controllers
                 return BadRequest(new APIResponse(400, ex.Message));
             }
         }
+
+        /// <summary>
+        /// Gets recommended products based on a list of product IDs.
+        /// </summary>
+        /// <param name="productIds"></param>
+        /// <returns></returns>
+        [HttpPost("get-recommended-products")]
+        public async Task<IActionResult> GetRecommendedProducts(List<int> productIds)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new APIResponse(400, "Invalid input: make sure all items are integers."));
+                }
+
+                if (productIds == null || !productIds.Any())
+                {
+                    return BadRequest(new APIResponse(400, "Product IDs cannot be null or empty."));
+                }
+
+                var products = await work.ProductRepository.GetAllRecommendedProducts(productIds);
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new APIResponse(400, ex.Message));
+            }
+        }
     }
 }
