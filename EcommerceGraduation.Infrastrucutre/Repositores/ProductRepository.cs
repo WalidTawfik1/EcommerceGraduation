@@ -71,18 +71,23 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             //filter by search
             if (!string.IsNullOrEmpty(productParams.search))
             {
-                var searchwords = productParams.search.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                if (searchwords.Any())
+                var rawSearchWords = productParams.search.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                // Replace ه with ة only when it's the last character of each word
+                var normalizedSearchWords = rawSearchWords.Select(word =>
+                    word.EndsWith('ه') ? word.Substring(0, word.Length - 1) + 'ة' : word
+                ).ToArray();
+
+                if (normalizedSearchWords.Any())
                 {
                     // Match ANY of the search words instead of ALL
-                    query = query.Where(m => searchwords.Any(
+                    query = query.Where(m => normalizedSearchWords.Any(
                         word => m.Name.ToLower().Contains(word.ToLower())
                         ||
                         m.Description.ToLower().Contains(word.ToLower())
                     ));
                 }
             }
-
 
 
             //filter by categoryId
