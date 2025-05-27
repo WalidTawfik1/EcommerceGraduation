@@ -41,7 +41,9 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
             {
                 return false;
             }
-            var photoUrl = product.ProductImages.FirstOrDefault().ImageUrl;
+
+            var photoUrl = product.ProductImages.FirstOrDefault()?.ImageUrl ?? "https://drive.google.com/open?id=1XPJh5f9DfFI_6ZZyaYGx04jbKHz9d6bV";
+
             wishlist.Items.Add(new Wishlist_Items
             {
                 ProductId = productId,

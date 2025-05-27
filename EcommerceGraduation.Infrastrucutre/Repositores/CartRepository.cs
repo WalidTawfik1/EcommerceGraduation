@@ -50,7 +50,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
                 }
                 else
                 {
-                    var photoUrl = product.ProductImages.FirstOrDefault().ImageUrl;
+                    var photoUrl = product.ProductImages.FirstOrDefault()?.ImageUrl ?? "https://drive.google.com/open?id=1XPJh5f9DfFI_6ZZyaYGx04jbKHz9d6bV";
 
                     // Add new item with product details
                     cart.Items.Add(new CartItem
