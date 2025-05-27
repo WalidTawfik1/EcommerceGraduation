@@ -37,6 +37,11 @@ namespace EcommerceGraduation.API.Controllers
             this.configuration = configuration;
         }
 
+        /// <summary>
+        /// Initiates payment processing for an order by its order number.
+        /// </summary>
+        /// <param name="orderNumber"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpPost("process-payment/{orderNumber}")]
         public async Task<IActionResult> ProcessPayment(string orderNumber)
@@ -100,6 +105,10 @@ namespace EcommerceGraduation.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Handles the callback from Paymob after payment processing.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("callback")]
         public async Task<IActionResult> CallbackAsync()
         {

@@ -61,7 +61,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
                 DateOnly today = DateOnly.FromDateTime(DateTime.Now);
 
                 var shippingsToUpdate = await dbContext.Shippings
-                    .Where(o => o.ShippingStatus == Status.Pending &&
+                    .Where(o => o.ShippingStatus == Status.Shipped &&
                                o.EstimatedDeliveryDate.HasValue &&
                                o.EstimatedDeliveryDate.Value == today &&
                                o.OrderNumber != null &&
