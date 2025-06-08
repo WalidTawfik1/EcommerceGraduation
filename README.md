@@ -77,4 +77,5 @@ To demonstrate the practical application of software engineering concepts, datab
 ## 🔗 Links
 
 - [Live Preview](https://graduation-project-smarket.vercel.app/)
+- [Mobile app](https://github.com/AmmarAlkady49/smarket-ecommerce-ai)
 - [GitHub Repository](https://github.com/WalidTawfik1/EcommerceGraduation)
