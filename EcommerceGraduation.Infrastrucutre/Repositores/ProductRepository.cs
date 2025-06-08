@@ -78,14 +78,25 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores
                     word.EndsWith('ه') ? word.Substring(0, word.Length - 1) + 'ة' : word
                 ).ToArray();
 
+                // Try to extract any potential product IDs from search terms
+                var potentialProductIds = rawSearchWords
+                    .Where(word => int.TryParse(word, out _))
+                    .Select(word => int.Parse(word))
+                    .ToList();
+
                 if (normalizedSearchWords.Any())
                 {
-                    // Match ANY of the search words instead of ALL
-                    query = query.Where(m => normalizedSearchWords.Any(
-                        word => m.Name.ToLower().Contains(word.ToLower())
-                        ||
-                        m.Description.ToLower().Contains(word.ToLower())
-                    ));
+                    // Match ANY of the search words (name/description) OR product ID
+                    query = query.Where(m =>
+                        normalizedSearchWords.Any(word =>
+                            m.Name.ToLower().Contains(word.ToLower()) ||
+                            m.Description.ToLower().Contains(word.ToLower()) ||
+                            m.CategoryCodeNavigation.Name.ToLower().Contains(word.ToLower()) ||
+                            m.SubCategoryCodeNavigation.Name.ToLower().Contains(word.ToLower()) ||
+                            m.BrandCodeNavigation.BrandName.ToLower().Contains(word.ToLower())
+                        ) ||
+                        (potentialProductIds.Any() && potentialProductIds.Contains(m.ProductId))
+                    );
                 }
             }
 
