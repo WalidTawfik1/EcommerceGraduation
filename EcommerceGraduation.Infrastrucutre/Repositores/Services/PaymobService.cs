@@ -201,97 +201,139 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
 
         public async Task<Order> UpdateOrderSuccess(string paymentIntentId)
         {
-            // Find the payment record by transaction ID
-            var payment = await _context.Payments
-                .FirstOrDefaultAsync(p => p.TransactionId == paymentIntentId);
-
-            if (payment == null)
+            try
             {
-                throw new InvalidOperationException($"Payment with transaction ID {paymentIntentId} not found.");
+                // Find the payment record by transaction ID
+                var payment = await _context.Payments
+                    .FirstOrDefaultAsync(p => p.TransactionId == paymentIntentId);
+
+                if (payment == null)
+                {
+                    // Try to find by order ID as a fallback
+                    payment = await _context.Payments
+                        .FirstOrDefaultAsync(p => p.OrderNumber == paymentIntentId);
+
+                    if (payment == null)
+                    {
+                        throw new InvalidOperationException($"Payment with ID {paymentIntentId} not found.");
+                    }
+                }
+
+                // Find the order linked to this payment
+                var order = await _context.Orders
+                    .Include(o => o.OrderDetails)
+                    .Include(o => o.Shippings)
+                    .Include(o => o.CustomerCodeNavigation)
+                    .FirstOrDefaultAsync(o => o.OrderNumber == payment.OrderNumber);
+
+                if (order == null)
+                {
+                    throw new InvalidOperationException($"Order with number {payment.OrderNumber} not found.");
+                }
+
+                var customerCode = order.CustomerCode;
+
+                // Update order status
+                order.OrderStatus = Status.Shipped;
+                order.PaymentStatus = Status.Success;
+
+                // Update shipping status if needed
+                var shipping = await _context.Shippings.FirstOrDefaultAsync(o => o.OrderNumber == order.OrderNumber);
+                if (shipping != null)
+                {
+                    shipping.ShippingStatus = Status.Shipped;
+                }
+
+                // Update payment record
+                payment.PaymentStatus = "Completed";
+                payment.PaymentDate = DateTime.Now;
+
+                // Save changes
+                await _unitofWork.CartRepository.DeleteCartAsync(customerCode);
+                _context.Orders.Update(order);
+                _context.Payments.Update(payment);
+                await _context.SaveChangesAsync();
+
+                await SendOrderSuccessEmailAsync(order, shipping);
+
+                return order;
             }
-
-            // Find the order linked to this payment
-            var order = await _context.Orders
-                .Include(o => o.OrderDetails)
-                .Include(o => o.Shippings)
-                .Include(o => o.CustomerCodeNavigation)
-                .FirstOrDefaultAsync(o => o.OrderNumber == payment.OrderNumber);
-
-            var customerCode = order.CustomerCode;
-
-            if (order == null)
+            catch (Exception ex)
             {
-                throw new InvalidOperationException($"Order with number {payment.OrderNumber} not found.");
+                // Log the exception
+                Console.WriteLine($"Error in UpdateOrderSuccess: {ex.Message}");
+                Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+
+                throw; // Re-throw to be caught by the controller
             }
-
-            // Update order status
-            order.OrderStatus = Status.Shipped;
-            order.PaymentStatus = Status.Success;
-
-            // Update shipping status if needed
-            var shipping = await _context.Shippings.FirstOrDefaultAsync(o => o.OrderNumber == order.OrderNumber);
-            if (shipping != null)
-            {
-                shipping.ShippingStatus = Status.Shipped;
-            }
-
-            // Update payment record
-            payment.PaymentStatus = "Completed";
-            payment.PaymentDate = DateTime.Now;
-
-            // Save changes
-            await _unitofWork.CartRepository.DeleteCartAsync(customerCode);
-            _context.Orders.Update(order);
-            _context.Payments.Update(payment);
-            await _context.SaveChangesAsync();
-
-            await SendOrderSuccessEmailAsync(order, shipping);
-
-            return order;
         }
 
         public async Task<Order> UpdateOrderFailed(string paymentIntentId)
         {
-            // Find the payment record by transaction ID
-            var payment = await _context.Payments
-                .FirstOrDefaultAsync(p => p.TransactionId == paymentIntentId);
-
-            if (payment == null)
+            try
             {
-                throw new InvalidOperationException($"Payment with transaction ID {paymentIntentId} not found.");
+                // Find the payment record by transaction ID
+                var payment = await _context.Payments
+                    .FirstOrDefaultAsync(p => p.TransactionId == paymentIntentId);
+
+                if (payment == null)
+                {
+                    // Try to find by order ID as a fallback
+                    payment = await _context.Payments
+                        .FirstOrDefaultAsync(p => p.OrderNumber == paymentIntentId);
+
+                    if (payment == null)
+                    {
+                        throw new InvalidOperationException($"Payment with ID {paymentIntentId} not found.");
+                    }
+                }
+
+                // Find the order linked to this payment
+                var order = await _context.Orders
+                    .Include(o => o.OrderDetails)
+                    .Include(o => o.Shippings)
+                    .Include(o => o.CustomerCodeNavigation)
+                    .FirstOrDefaultAsync(o => o.OrderNumber == payment.OrderNumber);
+
+                if (order == null)
+                {
+                    throw new InvalidOperationException($"Order with number {payment.OrderNumber} not found.");
+                }
+
+                var customerCode = order.CustomerCode;
+
+                // Update order status
+                order.OrderStatus = Status.PaymentFailed;
+                order.PaymentStatus = Status.Failed;
+
+                // Update shipping status if needed
+                var shipping = await _context.Shippings.FirstOrDefaultAsync(o => o.OrderNumber == order.OrderNumber);
+                if (shipping != null)
+                {
+                    shipping.ShippingStatus = Status.PaymentFailed;
+                }
+
+                // Update payment record
+                payment.PaymentStatus = "Failed";
+                payment.PaymentDate = DateTime.Now;
+
+                // Save changes
+                _context.Orders.Update(order);
+                _context.Payments.Update(payment);
+                await _context.SaveChangesAsync();
+
+                return order;
             }
-
-            // Find the order linked to this payment
-            var order = await _context.Orders
-                .Include(o => o.OrderDetails)
-                .FirstOrDefaultAsync(o => o.OrderNumber == payment.OrderNumber);
-
-            if (order == null)
+            catch (Exception ex)
             {
-                throw new InvalidOperationException($"Order with number {payment.OrderNumber} not found.");
+                // Log the exception
+                Console.WriteLine($"Error in UpdateOrderFailed: {ex.Message}");
+                Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+
+                throw; // Re-throw to be caught by the controller
             }
-
-            // Update order status
-            order.OrderStatus = Status.PaymentFailed;
-            order.PaymentStatus = Status.Failed;
-
-            // Update shipping status if needed
-            var shipping = await _context.Shippings.FirstOrDefaultAsync(o => o.OrderNumber == order.OrderNumber);
-            if (shipping != null)
-            {
-                shipping.ShippingStatus = Status.PaymentFailed;
-            }
-
-            // Update payment record
-            payment.PaymentStatus = "Failed";
-            payment.PaymentDate = DateTime.Now;
-
-            // Save changes
-            _context.Orders.Update(order);
-            _context.Payments.Update(payment);
-            await _context.SaveChangesAsync();
-
-            return order;
         }
 
         private async Task SendOrderSuccessEmailAsync(Order order, Shipping shipping)
