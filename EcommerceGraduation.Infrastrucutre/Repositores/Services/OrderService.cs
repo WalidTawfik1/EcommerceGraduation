@@ -189,6 +189,7 @@ namespace EcommerceGraduation.Infrastrucutre.Repositores.Services
             var orders = await _context.Orders.Where(o => o.CustomerCode == CustomerCode)
                 .Include(o => o.OrderDetails)
                 .Include(o => o.Shippings)
+                .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
 
             var result = _mapper.Map<IReadOnlyList<ReturnOrderDTO>>(orders);
